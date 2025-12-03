@@ -1,8 +1,6 @@
 package com.example.demo.models;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Offerta {
 
@@ -11,11 +9,8 @@ public class Offerta {
     private LocalDate dataOfferta;
     private String stato;
     private Double controfferta;
-    private List<Double> storicoOfferte;
 
-    public Offerta() {
-        this.storicoOfferte = new ArrayList<>();
-    }
+    public Offerta() {}
 
     public Offerta(Long idOfferta,
                    double prezzoProposto, LocalDate dataOfferta, String stato,
@@ -26,8 +21,6 @@ public class Offerta {
         this.dataOfferta = dataOfferta;
         this.stato = stato;
         this.controfferta = controfferta;
-        this.storicoOfferte = new ArrayList<>();
-        this.storicoOfferte.add(prezzoProposto);
     }
 
 
@@ -46,8 +39,4 @@ public class Offerta {
     public Double getControfferta() { return controfferta; }
     public void setControfferta(Double controfferta) { this.controfferta = controfferta; }
 
-    public List<Double> getStoricoOfferte() { return storicoOfferte; }
-    public void addStoricoOfferta(Double nuovaOfferta) {
-        this.storicoOfferte.add(nuovaOfferta);
-    }
 }

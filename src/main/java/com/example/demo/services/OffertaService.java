@@ -26,7 +26,6 @@ public class OffertaService {
         offerta.setIdOfferta(nextId++);
         offerta.setDataOfferta(LocalDate.now());
         offerta.setStato("IN_ATTESA");
-        offerta.addStoricoOfferta(offerta.getPrezzoProposto());
         offerte.add(offerta);
         return offerta;
     }
@@ -37,12 +36,10 @@ public class OffertaService {
 
         if (updated.getPrezzoProposto() != o.getPrezzoProposto()) {
             o.setPrezzoProposto(updated.getPrezzoProposto());
-            o.addStoricoOfferta(updated.getPrezzoProposto());
         }
 
         if (updated.getControfferta() != null) {
             o.setControfferta(updated.getControfferta());
-            o.addStoricoOfferta(updated.getControfferta());
         }
 
         o.setStato(updated.getStato());
