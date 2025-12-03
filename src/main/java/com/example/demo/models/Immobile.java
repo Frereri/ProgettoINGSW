@@ -2,7 +2,7 @@ package com.example.demo.models;
 
 import java.time.LocalDate;
 
-public class Immobile {
+public abstract class Immobile {
 
     private Long idImmobile;
     private String via;
