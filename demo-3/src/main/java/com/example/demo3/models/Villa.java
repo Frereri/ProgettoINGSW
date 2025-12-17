@@ -1,17 +1,23 @@
 package com.example.demo3.models;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+
+@Entity
+@DiscriminatorValue("Villa")
 public class Villa extends Immobile {
 
+    @Column(nullable = false)
     private Integer superficieGiardino;
+
+    @Column(nullable = false)
     private boolean piscina;
+
+    public Villa() {
+        super();
+    }
     
-    
-    
-    
-	public Villa() {
-		super();
-		
-	}
 	public Villa(Long idImmobile, String titolo, String indirizzo, String immagine, String descrizione, int dimensioni,
 			double prezzo, String piano, Integer numeroStanze, String classeEnergetica, boolean ascensore,
 			boolean portineria, boolean climatizzazione, boolean boxAuto, boolean terrazzo, boolean giardino,
