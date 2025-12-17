@@ -17,16 +17,20 @@ public class Appartamento extends Immobile {
     public Appartamento() {
         super();
     }
-    
+ 	
 	public Appartamento(Long idImmobile, String titolo, String indirizzo, String immagine, String descrizione,
-			int dimensioni, double prezzo, String piano, Integer numeroStanze, String classeEnergetica,
+			Integer dimensioni, double prezzo, String piano, Integer numeroStanze, String classeEnergetica,
 			boolean ascensore, boolean portineria, boolean climatizzazione, boolean boxAuto, boolean terrazzo,
-			boolean giardino, String tipoAnnuncio, String tipoImmobile, String emailAgente,Integer numeroBalconi, boolean cantina) {
+			boolean giardino, String tipoAnnuncio, String emailAgente, Integer numerobalconi, boolean cantina) {
 		super(idImmobile, titolo, indirizzo, immagine, descrizione, dimensioni, prezzo, piano, numeroStanze, classeEnergetica,
-				ascensore, portineria, climatizzazione, boxAuto, terrazzo, giardino, tipoAnnuncio, tipoImmobile, emailAgente);
-		setCantina(cantina);
-		setNumeroBalconi(numeroBalconi);
+				ascensore, portineria, climatizzazione, boxAuto, terrazzo, giardino, tipoAnnuncio, emailAgente);
+		this.numeroBalconi=numerobalconi;
+		this.cantina=cantina;
 	}
+
+
+
+
 	public Integer getNumeroBalconi() {
 		return numeroBalconi;
 	}
@@ -40,6 +44,6 @@ public class Appartamento extends Immobile {
 		this.cantina = cantina;
 	}
 
-    
 	
 }
+
