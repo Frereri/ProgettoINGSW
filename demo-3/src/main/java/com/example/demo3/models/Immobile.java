@@ -19,15 +19,22 @@ public abstract class Immobile {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="idimmobile")
     private Long idImmobile;
+	@Column(nullable = false, length = 255)
     private String titolo;
+	@Column(nullable = false, length = 255)
     private String indirizzo;
     private String immagine;
+    @Column(nullable = false, length = 255)
     private String descrizione;
+    @Column(nullable = false, length = 255)
     private Integer dimensioni;
+    @Column(nullable = false, length = 255)
     private double prezzo;
+    @Column(nullable = false, length = 255)
     private String piano;
+    @Column(nullable = false, length = 255)
     private Integer numeroStanze;
-    @Column(name="classeenergetica")
+    @Column(name="classeenergetica",nullable = false, length = 255)
     private String classeEnergetica;
     private boolean ascensore;
     private boolean portineria;
