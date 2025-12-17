@@ -17,29 +17,46 @@ public class Villa extends Immobile {
     public Villa() {
         super();
     }
-    
-	public Villa(Long idImmobile, String titolo, String indirizzo, String immagine, String descrizione, int dimensioni,
-			double prezzo, String piano, Integer numeroStanze, String classeEnergetica, boolean ascensore,
-			boolean portineria, boolean climatizzazione, boolean boxAuto, boolean terrazzo, boolean giardino,
-			String tipoAnnuncio, String tipoImmobile, String emailAgente,Integer superficieGiardino, boolean piscina) {
+	
+  public Villa(Long idImmobile, String titolo, String indirizzo, String immagine, String descrizione,
+			Integer dimensioni, double prezzo, String piano, Integer numeroStanze, String classeEnergetica,
+			boolean ascensore, boolean portineria, boolean climatizzazione, boolean boxAuto, boolean terrazzo,
+			boolean giardino, String tipoAnnuncio, String emailAgente, Integer superficiegiardino, boolean piscina) {
 		super(idImmobile, titolo, indirizzo, immagine, descrizione, dimensioni, prezzo, piano, numeroStanze, classeEnergetica,
-				ascensore, portineria, climatizzazione, boxAuto, terrazzo, giardino, tipoAnnuncio, tipoImmobile, emailAgente);
-		setSuperficieGiardino(superficieGiardino);
-		setPiscina(piscina);
-		
+				ascensore, portineria, climatizzazione, boxAuto, terrazzo, giardino, tipoAnnuncio, emailAgente);
+		this.superficieGiardino=superficiegiardino;
+		this.piscina=piscina;
 	}
+
+
+
+
 	public Integer getSuperficieGiardino() {
 		return superficieGiardino;
 	}
+
+
+
+
 	public void setSuperficieGiardino(Integer superficieGiardino) {
 		this.superficieGiardino = superficieGiardino;
 	}
+
+
+
+
 	public boolean isPiscina() {
 		return piscina;
 	}
+
+
+
+
 	public void setPiscina(boolean piscina) {
 		this.piscina = piscina;
 	}
-
+	
+	
     
 }
+
