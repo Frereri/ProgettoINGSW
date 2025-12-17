@@ -1,36 +1,55 @@
 package com.example.demo3.models;
 
-public abstract class Immobile {
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.DiscriminatorType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name="tipoimmobile",  discriminatorType = DiscriminatorType.STRING)
+public abstract class Immobile {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name="idimmobile")
     private Long idImmobile;
     private String titolo;
     private String indirizzo;
     private String immagine;
     private String descrizione;
-    private int dimensioni;
+    private Integer dimensioni;
     private double prezzo;
     private String piano;
     private Integer numeroStanze;
+    @Column(name="classeenergetica")
     private String classeEnergetica;
     private boolean ascensore;
     private boolean portineria;
     private boolean climatizzazione;
+    @Column(name="boxauto")
     private boolean boxAuto;
     private boolean terrazzo;
     private boolean giardino;
-    private String tipoAnnuncio;   
-    private String tipoImmobile;   
+    private String tipoAnnuncio;     
     private String emailAgente;
-	
+    
     
     public Immobile() {
     	
     }
     
-    public Immobile(Long idImmobile, String titolo, String indirizzo, String immagine, String descrizione,
-			int dimensioni, double prezzo, String piano, Integer numeroStanze, String classeEnergetica,
+    
+    
+	public Immobile(Long idImmobile, String titolo, String indirizzo, String immagine, String descrizione,
+			Integer dimensioni, double prezzo, String piano, Integer numeroStanze, String classeEnergetica,
 			boolean ascensore, boolean portineria, boolean climatizzazione, boolean boxAuto, boolean terrazzo,
-			boolean giardino, String tipoAnnuncio, String tipoImmobile, String emailAgente) {
+			boolean giardino, String tipoAnnuncio, String emailAgente) {
 		super();
 		this.idImmobile = idImmobile;
 		this.titolo = titolo;
@@ -49,162 +68,226 @@ public abstract class Immobile {
 		this.terrazzo = terrazzo;
 		this.giardino = giardino;
 		this.tipoAnnuncio = tipoAnnuncio;
-		this.tipoImmobile = tipoImmobile;
 		this.emailAgente = emailAgente;
 	}
-    
+
+
+
 	public Long getIdImmobile() {
 		return idImmobile;
 	}
+
+
+
 	public void setIdImmobile(Long idImmobile) {
 		this.idImmobile = idImmobile;
 	}
-	
-	
+
+
+
 	public String getTitolo() {
 		return titolo;
 	}
+
+
+
 	public void setTitolo(String titolo) {
 		this.titolo = titolo;
 	}
-	
-	
+
+
+
 	public String getIndirizzo() {
 		return indirizzo;
 	}
+
+
+
 	public void setIndirizzo(String indirizzo) {
 		this.indirizzo = indirizzo;
 	}
-	
-	
+
+
+
 	public String getImmagine() {
 		return immagine;
 	}
+
+
+
 	public void setImmagine(String immagine) {
 		this.immagine = immagine;
 	}
-	
-	
+
+
+
 	public String getDescrizione() {
 		return descrizione;
 	}
+
+
+
 	public void setDescrizione(String descrizione) {
 		this.descrizione = descrizione;
 	}
-	
-	
-	public int getDimensioni() {
+
+
+
+	public Integer getDimensioni() {
 		return dimensioni;
 	}
-	public void setDimensioni(int dimensioni) {
+
+
+
+	public void setDimensioni(Integer dimensioni) {
 		this.dimensioni = dimensioni;
 	}
-	
-	
+
+
+
 	public double getPrezzo() {
 		return prezzo;
 	}
+
+
+
 	public void setPrezzo(double prezzo) {
 		this.prezzo = prezzo;
 	}
-	
-	
+
+
+
 	public String getPiano() {
 		return piano;
 	}
+
+
+
 	public void setPiano(String piano) {
 		this.piano = piano;
 	}
-	
-	
+
+
+
 	public Integer getNumeroStanze() {
 		return numeroStanze;
 	}
+
+
+
 	public void setNumeroStanze(Integer numeroStanze) {
 		this.numeroStanze = numeroStanze;
 	}
-	
-	
+
+
+
 	public String getClasseEnergetica() {
 		return classeEnergetica;
 	}
+
+
+
 	public void setClasseEnergetica(String classeEnergetica) {
 		this.classeEnergetica = classeEnergetica;
 	}
-	
-	
+
+
+
 	public boolean isAscensore() {
 		return ascensore;
 	}
+
+
+
 	public void setAscensore(boolean ascensore) {
 		this.ascensore = ascensore;
 	}
-	
-	
+
+
+
 	public boolean isPortineria() {
 		return portineria;
 	}
+
+
+
 	public void setPortineria(boolean portineria) {
 		this.portineria = portineria;
 	}
-	
-	
+
+
+
 	public boolean isClimatizzazione() {
 		return climatizzazione;
 	}
+
+
+
 	public void setClimatizzazione(boolean climatizzazione) {
 		this.climatizzazione = climatizzazione;
 	}
-	
-	
+
+
+
 	public boolean isBoxAuto() {
 		return boxAuto;
 	}
+
+
+
 	public void setBoxAuto(boolean boxAuto) {
 		this.boxAuto = boxAuto;
 	}
-	
-	
+
+
+
 	public boolean isTerrazzo() {
 		return terrazzo;
 	}
+
+
+
 	public void setTerrazzo(boolean terrazzo) {
 		this.terrazzo = terrazzo;
 	}
-	
-	
+
+
+
 	public boolean isGiardino() {
 		return giardino;
 	}
+
+
+
 	public void setGiardino(boolean giardino) {
 		this.giardino = giardino;
 	}
-	
-	
+
+
+
 	public String getTipoAnnuncio() {
 		return tipoAnnuncio;
 	}
+
+
+
 	public void setTipoAnnuncio(String tipoAnnuncio) {
 		this.tipoAnnuncio = tipoAnnuncio;
 	}
-	
-	
-	public String getTipoImmobile() {
-		return tipoImmobile;
-	}
-	public void setTipoImmobile(String tipoImmobile) {
-		this.tipoImmobile = tipoImmobile;
-	}
-	
-	
+
+
+
 	public String getEmailAgente() {
 		return emailAgente;
 	}
+
+
+
 	public void setEmailAgente(String emailAgente) {
 		this.emailAgente = emailAgente;
-	}    
-
-   
+	}
+    
+    
     
     
 }
