@@ -2,9 +2,10 @@ package com.example.demo3.DTO;
 
 public class UtenteRegistrazioneDTO {
 	
+	private String nome;
+	private String cognome;
 	private String email;
 	private String password;
-	private String confermaPassword;
 	
 	
 	
@@ -13,10 +14,26 @@ public class UtenteRegistrazioneDTO {
 	}
 	
 	
-	public UtenteRegistrazioneDTO(String email, String password, String confermaPassword) {
+	public UtenteRegistrazioneDTO(String nome, String cognome, String email, String password) {
+		
+		this.nome = nome;
+		this.cognome = cognome;
 		this.email = email;
 		this.password = password;
-		this.confermaPassword = confermaPassword;
+	}
+	
+	
+	public String getNome() {
+		return nome;
+	}
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+	public String getCognome() {
+		return cognome;
+	}
+	public void setCognome(String cognome) {
+		this.cognome = cognome;
 	}
 	public String getEmail() {
 		return email;
@@ -29,12 +46,6 @@ public class UtenteRegistrazioneDTO {
 	}
 	public void setPassword(String password) {
 		this.password = password;
-	}
-	public String getConfermaPassword() {
-		return confermaPassword;
-	}
-	public void setConfermaPassword(String confermaPassword) {
-		this.confermaPassword = confermaPassword;
 	}
 	
 	
