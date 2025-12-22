@@ -7,5 +7,5 @@ import com.example.demo3.models.Agente;
 
 @Repository
 public interface AgenteRepo extends JpaRepository<Agente, Integer>{
-
+	Agente findByEmail(String email);
 }

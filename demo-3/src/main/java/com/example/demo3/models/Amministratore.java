@@ -3,11 +3,11 @@ package com.example.demo3.models;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 
-@Entity
+//@Entity
 public class Amministratore extends Utente {
-	@Column(nullable = false, length = 20)
+	//@Column(nullable = false, length = 20)
 	private String partitaIva;
-	@Column(nullable = false, length = 255)
+	//@Column(nullable = false, length = 255)
 	private String nomeAgenziaImmobiliare;
 	
 	

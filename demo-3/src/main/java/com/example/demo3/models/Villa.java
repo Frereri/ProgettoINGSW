@@ -59,4 +59,3 @@ public class Villa extends Immobile {
 	
     
 }
-
