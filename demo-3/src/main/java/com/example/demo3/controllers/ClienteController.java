@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import com.example.demo3.DTO.ClienteLoginDTO;
 import com.example.demo3.DTO.ClienteRegistrazioneDTO;
 import com.example.demo3.DTO.MostraClienteDTO;
-import com.example.demo3.exception.BadRequestException;
 import com.example.demo3.services.ClienteService;
 
 
@@ -64,12 +63,9 @@ public class ClienteController {
 
 	@PostMapping("/Registrazione")
 	public ResponseEntity<?> Registrazione(@RequestBody ClienteRegistrazioneDTO dto){
-		try {
-			clienteService.registrazione(dto);
-			return ResponseEntity.ok("Registrazione andata a buon fine");
-		}catch (BadRequestException e) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-		}
+	    clienteService.registrazione(dto);
+	    return ResponseEntity.ok("Registrazione andata a buon fine");
 	}
+
 
 }

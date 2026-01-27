@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo3.DTO.ClienteLoginDTO;
 import com.example.demo3.DTO.ClienteRegistrazioneDTO;
@@ -14,7 +16,7 @@ import com.example.demo3.DTO.MostraClienteDTO;
 import com.example.demo3.mapper.IClienteMapper;
 import com.example.demo3.models.Cliente;
 import com.example.demo3.repositories.ClienteRepo;
-import com.example.demo3.exception.BadRequestException;
+
 
 
 @Service
@@ -57,30 +59,32 @@ public class ClienteService {
          return result.isPresent();
      }
     
+
     public void registrazione(ClienteRegistrazioneDTO dto) {
 
         if (dto.getNome() == null || dto.getNome().isBlank()) {
-            throw new BadRequestException("Il nome è obbligatorio");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il nome è obbligatorio");
         }
 
         if (dto.getCognome() == null || dto.getCognome().isBlank()) {
-            throw new BadRequestException("Il cognome è obbligatorio");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Il cognome è obbligatorio");
         }
 
         if (dto.getEmail() == null || dto.getEmail().isBlank()) {
-            throw new BadRequestException("L'email è obbligatoria");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "L'email è obbligatoria");
         }
 
         if (dto.getPassword() == null || dto.getPassword().isBlank()) {
-            throw new BadRequestException("La password è obbligatoria");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La password è obbligatoria");
         }
 
         if (clienteRepo.existsByEmail(dto.getEmail())) {
-            throw new BadRequestException("Email già esistente");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email già esistente");
         }
 
         Cliente cli = clienteMapper.clienteDTOToClienteRegistrazione(dto);
         clienteRepo.save(cli);
     }
+
 
  }
