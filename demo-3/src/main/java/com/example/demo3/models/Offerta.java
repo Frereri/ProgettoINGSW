@@ -70,4 +70,13 @@ public class Offerta {
     	this.controfferta = controfferta;
     }
 
+
+	@Override
+	public String toString() {
+		return "Offerta [idOfferta=" + idOfferta + ", prezzoProposto=" + prezzoProposto + ", dataOfferta=" + dataOfferta
+				+ ", stato=" + stato + ", controfferta=" + controfferta + ", getClass()=" + getClass() + ", hashCode()="
+				+ hashCode() + ", toString()=" + super.toString() + "]";
+	}
+
+    
 }

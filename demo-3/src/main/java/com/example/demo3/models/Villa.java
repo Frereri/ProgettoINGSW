@@ -55,6 +55,20 @@ public class Villa extends Immobile {
 	public void setPiscina(boolean piscina) {
 		this.piscina = piscina;
 	}
+
+	@Override
+	public String toString() {
+		return "Villa [superficieGiardino=" + superficieGiardino + ", piscina=" + piscina + ", getIdImmobile()="
+				+ getIdImmobile() + ", getTitolo()=" + getTitolo() + ", getIndirizzo()=" + getIndirizzo()
+				+ ", getImmagine()=" + getImmagine() + ", getDescrizione()=" + getDescrizione() + ", getDimensioni()="
+				+ getDimensioni() + ", getPrezzo()=" + getPrezzo() + ", getPiano()=" + getPiano()
+				+ ", getNumeroStanze()=" + getNumeroStanze() + ", getClasseEnergetica()=" + getClasseEnergetica()
+				+ ", isAscensore()=" + isAscensore() + ", isPortineria()=" + isPortineria() + ", isClimatizzazione()="
+				+ isClimatizzazione() + ", isBoxAuto()=" + isBoxAuto() + ", isTerrazzo()=" + isTerrazzo()
+				+ ", isGiardino()=" + isGiardino() + ", getTipoAnnuncio()=" + getTipoAnnuncio() + ", getEmailAgente()="
+				+ getEmailAgente() + ", toString()=" + super.toString() + ", getClass()=" + getClass() + ", hashCode()="
+				+ hashCode() + "]";
+	}
 	
 	
     

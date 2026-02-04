@@ -44,5 +44,19 @@ public class Appartamento extends Immobile {
 		this.cantina = cantina;
 	}
 
+	@Override
+	public String toString() {
+		return "Appartamento [numeroBalconi=" + numeroBalconi + ", cantina=" + cantina + ", getIdImmobile()="
+				+ getIdImmobile() + ", getTitolo()=" + getTitolo() + ", getIndirizzo()=" + getIndirizzo()
+				+ ", getImmagine()=" + getImmagine() + ", getDescrizione()=" + getDescrizione() + ", getDimensioni()="
+				+ getDimensioni() + ", getPrezzo()=" + getPrezzo() + ", getPiano()=" + getPiano()
+				+ ", getNumeroStanze()=" + getNumeroStanze() + ", getClasseEnergetica()=" + getClasseEnergetica()
+				+ ", isAscensore()=" + isAscensore() + ", isPortineria()=" + isPortineria() + ", isClimatizzazione()="
+				+ isClimatizzazione() + ", isBoxAuto()=" + isBoxAuto() + ", isTerrazzo()=" + isTerrazzo()
+				+ ", isGiardino()=" + isGiardino() + ", getTipoAnnuncio()=" + getTipoAnnuncio() + ", getEmailAgente()="
+				+ getEmailAgente() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
+				+ super.toString() + "]";
+	}
+
 	
 }

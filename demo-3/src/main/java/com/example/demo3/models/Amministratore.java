@@ -48,6 +48,17 @@ public class Amministratore extends Utente {
 	public void setNomeAgenziaImmobiliare(String nomeAgenziaImmobiliare) {
 		this.nomeAgenziaImmobiliare = nomeAgenziaImmobiliare;
 	}
+
+
+
+
+	@Override
+	public String toString() {
+		return "Amministratore [partitaIva=" + partitaIva + ", nomeAgenziaImmobiliare=" + nomeAgenziaImmobiliare
+				+ ", getNome()=" + getNome() + ", getCognome()=" + getCognome() + ", getEmail()=" + getEmail()
+				+ ", getPassword()=" + getPassword() + ", getClass()=" + getClass() + ", hashCode()=" + hashCode()
+				+ ", toString()=" + super.toString() + "]";
+	}
 	
 	
 	
