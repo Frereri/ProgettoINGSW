@@ -293,19 +293,6 @@ public abstract class Immobile {
 	public void setEmailAgente(String emailAgente) {
 		this.emailAgente = emailAgente;
 	}
-
-
-
-	@Override
-	public String toString() {
-		return "Immobile [idImmobile=" + idImmobile + ", titolo=" + titolo + ", indirizzo=" + indirizzo + ", immagine="
-				+ immagine + ", descrizione=" + descrizione + ", dimensioni=" + dimensioni + ", prezzo=" + prezzo
-				+ ", piano=" + piano + ", numeroStanze=" + numeroStanze + ", classeEnergetica=" + classeEnergetica
-				+ ", ascensore=" + ascensore + ", portineria=" + portineria + ", climatizzazione=" + climatizzazione
-				+ ", boxAuto=" + boxAuto + ", terrazzo=" + terrazzo + ", giardino=" + giardino + ", tipoAnnuncio="
-				+ tipoAnnuncio + ", emailAgente=" + emailAgente + ", getClass()=" + getClass() + ", hashCode()="
-				+ hashCode() + ", toString()=" + super.toString() + "]";
-	}
     
     
     

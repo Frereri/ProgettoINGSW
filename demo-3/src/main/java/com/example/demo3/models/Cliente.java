@@ -43,14 +43,5 @@ public class Cliente extends Utente{
 	public void setIdCliente(Integer idCliente) {
 		this.idCliente = idCliente;
 	}
-
-
-	@Override
-	public String toString() {
-		return "Cliente [idCliente=" + idCliente + ", getNome()=" + getNome() + ", getCognome()=" + getCognome()
-				+ ", getEmail()=" + getEmail() + ", getPassword()=" + getPassword() + ", getClass()=" + getClass()
-				+ ", hashCode()=" + hashCode() + ", toString()=" + super.toString() + "]";
-	}
-	
 	
 }

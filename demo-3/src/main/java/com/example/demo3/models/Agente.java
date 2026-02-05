@@ -22,11 +22,15 @@ public class Agente extends Utente{
 	@Column(name="partitaiva")
 	private String partitaIva;
 	
+
+	
 	
 	public Agente() {
 		super();
 	}
 
+	
+	
 	
 	public Agente(Integer idAgente, String partitaIva, List<Cliente> elenciClienti) {
 		super();
@@ -49,15 +53,6 @@ public class Agente extends Utente{
 
 	public void setIdAgente(Integer idAgente) {
 		this.idAgente = idAgente;
-	}
-
-
-	@Override
-	public String toString() {
-		return "Agente [idAgente=" + idAgente + ", partitaIva=" + partitaIva + ", getNome()=" + getNome()
-				+ ", getCognome()=" + getCognome() + ", getEmail()=" + getEmail() + ", getPassword()=" + getPassword()
-				+ ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()=" + super.toString()
-				+ "]";
 	}
 
 
