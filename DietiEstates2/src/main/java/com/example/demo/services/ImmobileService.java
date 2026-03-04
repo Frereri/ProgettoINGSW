@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
@@ -36,10 +38,9 @@ public class ImmobileService {
     @Autowired
     private GeoService geoService;
 
-    public List<ImmobileDTO> getAllImmobili() {
-        return repo.findAll().stream()
-                .map(mapper::immobileToDTO)
-                .toList();
+    public Page<ImmobileDTO> getAllImmobili(Pageable pageable) {
+        return repo.findAll(pageable)
+                   .map(mapper::immobileToDTO); 
     }
     
     public ImmobileDTO getImmobileById(Integer id) {

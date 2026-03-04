@@ -1,11 +1,82 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Aggiunto useNavigate qui
 import immobileService from '../services/immobileService';
 import Logo from '../components/Logo.js';
+import { fetchAuthSession } from 'aws-amplify/auth';
+const Navbar = () => {
+    const navigate = useNavigate();
+    const [userRole, setUserRole] = useState(null); // Memorizziamo il ruolo
+
+    useEffect(() => {
+        checkUser();
+    }, []);
+
+    const checkUser = async () => {
+        try {
+            const session = await fetchAuthSession();
+            // Controlliamo che i token siano validi e presenti
+            if (session && session.tokens) {
+                const groups = session.tokens.accessToken.payload['cognito:groups'] || [];
+                
+                // Debug: vedi cosa arriva esattamente da Cognito
+                console.log("Gruppi da Cognito:", groups);
+
+                if (groups.includes('Gestori')) {
+                    setUserRole('GESTORI');
+                } else if (groups.includes('Clienti')) {
+                    setUserRole('CLIENTI');
+                }
+            } else {
+                // Se non c'è sessione, resettiamo il ruolo
+                setUserRole(null);
+            }
+        } catch (err) {
+            console.log("Nessuna sessione attiva");
+            setUserRole(null);
+        }
+    };
+
+    const handleAreaPersonale = () => {
+        console.log("Ruolo attuale in stato:", userRole);
+        if (userRole === 'AMMINISTRATORE') navigate('/admin');
+        else if (userRole === 'CLIENTI') navigate('/cliente');
+        else if (userRole === 'GESTORI') navigate('/gestore');
+        else if (userRole === 'SUPPORTO') navigate('/supportp');
+        else if (userRole === 'AGENTI') navigate('/agente');
+        else {
+            navigate('/'); 
+            console.warn("Nessuna corrispondenza trovata per il ruolo:", userRole   );
+            alert("Ruolo non riconosciuto. Controlla la console.");
+        }
+    };
+
+    return (
+        <nav style={navStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', cursor: 'pointer' }} onClick={() => navigate('/')}>
+                <Logo width="40px" height="40px" />
+                <h2 style={{ margin: 0 }}>DietiEstates25</h2>
+            </div>
+
+            {userRole ? (
+                /* Se loggato, mostriamo il tasto Area Personale */
+                <button onClick={handleAreaPersonale} style={areaPersonaleStyle}>
+                    👤 La mia Area
+                </button>
+            ) : (
+                /* Se non loggato, mostriamo Accedi */
+                <button onClick={() => navigate('/login')} style={loginButtonStyle}>
+                    Accedi / Registrati
+                </button>
+            )}
+        </nav>
+    );
+};
 
 const Dashboard = () => {
     const [immobili, setImmobili] = useState([]);
-    // Stato per i filtri di ricerca
+    const [page, setPage] = useState(0); // Stato per la pagina attuale
+    const [totalPages, setTotalPages] = useState(0); // Per sapere quante pagine ci sono
+    
     const [filters, setFilters] = useState({
         citta: '',
         min: 0,
@@ -14,20 +85,26 @@ const Dashboard = () => {
     });
 
     useEffect(() => {
-        caricaDati();
+        caricaDati(0); // Carica la prima pagina all'avvio
     }, []);
 
-    const caricaDati = () => {
-        immobileService.getAllImmobili()
-            .then(res => setImmobili(res.data))
+    // Modificata per supportare la paginazione
+    const caricaDati = (p) => {
+        setPage(p);
+        // Passiamo page e size (es. 10 immobili per volta)
+        immobileService.getAllImmobili(p, 10) 
+            .then(res => {
+                // Se il backend restituisce un oggetto Page di Spring:
+                setImmobili(res.data.content || res.data); 
+                setTotalPages(res.data.totalPages || 0);
+            })
             .catch(err => alert("Errore: " + err.message));
     };
 
-    // Funzione per la ricerca avanzata
     const gestisciRicerca = (e) => {
         e.preventDefault();
         immobileService.searchImmobili(filters)
-            .then(res => setImmobili(res.data))
+            .then(res => setImmobili(res.data.content || res.data))
             .catch(err => console.error(err));
     };
 
@@ -36,53 +113,91 @@ const Dashboard = () => {
     };
 
     return (
-        <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '20px' }}>
-            {/* HEADER CON LOGO */}
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-                <Logo width="60px" height="60px" />
-                <h1>Dieti Estates</h1>
-            </header>
+        <div style={{ backgroundColor: '#fdfdfd', minHeight: '100vh' }}>
+            {/* 1. Inseriamo la Navbar qui! */}
+            <Navbar />
 
-            {/* BARRA DI RICERCA AVANZATA */}
-            <section style={{ backgroundColor: '#f4f4f4', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
-                <form onSubmit={gestisciRicerca} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                    <input name="citta" placeholder="Città" onChange={handleChange} style={inputStyle} />
-                    <input name="min" type="number" placeholder="Prezzo Min" onChange={handleChange} style={inputStyle} />
-                    <input name="max" type="number" placeholder="Prezzo Max" onChange={handleChange} style={inputStyle} />
-                    <select name="contratto" onChange={handleChange} style={inputStyle}>
-                        <option value="">Tutti i contratti</option>
-                        <option value="VENDITA">Vendita</option>
-                        <option value="AFFITTO">Affitto</option>
-                    </select>
-                    <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                        Cerca
-                    </button>
-                    <button type="button" onClick={caricaDati} style={{ padding: '10px', backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: '4px' }}>
-                        Reset
-                    </button>
-                </form>
-            </section>
+            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
+                {/* BARRA DI RICERCA */}
+                <section style={filterSectionStyle}>
+                    <form onSubmit={gestisciRicerca} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                        <input name="citta" placeholder="Città" onChange={handleChange} style={inputStyle} />
+                        <input name="min" type="number" placeholder="Prezzo Min" onChange={handleChange} style={inputStyle} />
+                        <input name="max" type="number" placeholder="Prezzo Max" onChange={handleChange} style={inputStyle} />
+                        <select name="contratto" onChange={handleChange} style={inputStyle}>
+                            <option value="">Tutti i contratti</option>
+                            <option value="VENDITA">Vendita</option>
+                            <option value="AFFITTO">Affitto</option>
+                        </select>
+                        <button type="submit" style={searchButtonStyle}>Cerca</button>
+                    </form>
+                </section>
 
-            <hr />
+                {/* LISTA IMMOBILI */}
+                <div style={gridStyle}>
+                    {immobili.length > 0 ? immobili.map(i => (
+                        <div key={i.idImmobile} style={cardStyle}>
+                            <Link to={`/immobile/${i.idImmobile}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <div style={imagePlaceholderStyle}>Foto Immobile</div>
+                                <h3 style={{ margin: '10px 0' }}>{i.titolo}</h3>
+                                <p style={{ color: '#2C3E50', fontWeight: 'bold', fontSize: '1.2rem' }}>{i.prezzo} €</p>
+                                <p style={{ color: '#666' }}>{i.citta}</p>
+                            </Link>
+                        </div>
+                    )) : <p>Nessun immobile trovato.</p>}
+                </div>
 
-            {/* LISTA IMMOBILI */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px', marginTop: '20px' }}>
-                {immobili.length > 0 ? immobili.map(i => (
-                    <div key={i.idImmobile} style={cardStyle}>
-                        <Link to={`/immobile/${i.idImmobile}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                            <h3 style={{ margin: '0 0 10px 0' }}>{i.titolo}</h3>
-                            <p style={{ color: '#007bff', fontWeight: 'bold' }}>{i.prezzo} €</p>
-                            <p style={{ fontSize: '0.9rem', color: '#666' }}>{i.citta} ({i.tipoContratto || 'Vendita'})</p>
-                        </Link>
+                {/* 2. CONTROLLI PAGINAZIONE */}
+                {totalPages > 1 && (
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '30px' }}>
+                        <button disabled={page === 0} onClick={() => caricaDati(page - 1)}>Precedente</button>
+                        <span>Pagina {page + 1} di {totalPages}</span>
+                        <button disabled={page >= totalPages - 1} onClick={() => caricaDati(page + 1)}>Successiva</button>
                     </div>
-                )) : <p>Nessun immobile trovato.</p>}
+                )}
             </div>
         </div>
     );
 };
 
-// Piccoli stili per pulire l'interfaccia
-const inputStyle = { padding: '10px', borderRadius: '4px', border: '1px solid #ccc', flex: '1' };
-const cardStyle = { border: '1px solid #ddd', padding: '15px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', transition: 'transform 0.2s' };
+// --- STILI ---
+
+const areaPersonaleStyle = {
+    padding: '10px 20px',
+    backgroundColor: '#3498DB',
+    color: 'white',
+    border: 'none',
+    borderRadius: '20px',
+    cursor: 'pointer',
+    fontWeight: 'bold'
+};
+
+const navStyle = { 
+    display: 'flex', 
+    justifyContent: 'space-between', 
+    padding: '15px 50px', 
+    backgroundColor: '#2C3E50', 
+    color: 'white', 
+    alignItems: 'center',
+    marginBottom: '20px' 
+};
+
+const loginButtonStyle = {
+    padding: '8px 20px', 
+    backgroundColor: '#5DADE2', 
+    border: 'none',
+    borderRadius: '5px', 
+    color: 'white', 
+    cursor: 'pointer', 
+    fontWeight: 'bold'
+};
+
+
+const filterSectionStyle = { backgroundColor: 'white', padding: '20px', borderRadius: '12px', marginBottom: '30px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' };
+const gridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '25px' };
+const inputStyle = { padding: '10px', borderRadius: '6px', border: '1px solid #ddd', flex: '1', minWidth: '150px' };
+const cardStyle = { backgroundColor: 'white', padding: '15px', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', transition: 'transform 0.2s' };
+const imagePlaceholderStyle = { width: '100%', height: '150px', backgroundColor: '#eee', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999' };
+const searchButtonStyle = { padding: '10px 25px', backgroundColor: '#2C3E50', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' };
 
 export default Dashboard;

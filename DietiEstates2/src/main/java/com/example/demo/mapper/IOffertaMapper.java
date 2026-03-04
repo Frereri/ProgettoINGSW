@@ -25,9 +25,12 @@ public interface IOffertaMapper {
         return "Cliente Anonimo";
     }
 
+    
     @Mapping(target = "cliente", ignore = true)
     @Mapping(target = "immobile", ignore = true)
     @Mapping(target = "idOfferta", ignore = true)
+    @Mapping(target = "stato", constant = "IN_ATTESA")
+    @Mapping(target = "offertaEsterna", constant = "false")
+    @Mapping(source = "prezzoOriginale", target = "prezzoOriginale") 
     Offerta dtoToOfferta(OffertaDTO dto);
-    
 }

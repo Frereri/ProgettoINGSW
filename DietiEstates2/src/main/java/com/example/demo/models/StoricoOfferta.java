@@ -3,6 +3,8 @@ package com.example.demo.models;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,7 +39,8 @@ public class StoricoOfferta {
     @Column(name = "nota", columnDefinition = "TEXT")
     private String nota;
 
-    @Column(name = "data_azione", insertable = false, updatable = false)
+    @Column(name = "data_azione", updatable = false)
+    @CreationTimestamp
     private LocalDateTime dataAzione;
 
     @Column(name = "autore_azione", nullable = false)

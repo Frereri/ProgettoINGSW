@@ -57,15 +57,8 @@
 		<dependency>
         	<groupId>org.mapstruct</groupId>
         	<artifactId>mapstruct</artifactId>
-        	<version>1.5.5.Final</version> <!-- usa l'ultima versione stabile -->
+        	<version>1.5.5.Final</version> 
     	</dependency>
-    	<dependency>
-        	<groupId>org.mapstruct</groupId>        	
-        	<!-- <artifactId>mapstruct-processor</artifactId> -->
-            <artifactId>mapstruct</artifactId>
-        	<version>1.5.5.Final</version>
-        	<scope>provided</scope>
-    	</dependency> 
     	<dependency>
 		    <groupId>software.amazon.awssdk</groupId>
 		    <artifactId>cognitoidentityprovider</artifactId>

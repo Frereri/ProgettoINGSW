@@ -35,13 +35,16 @@ public class GestoreService {
 
         String cognitoSub = authService.adminCreateUser(nuovoAgenteDto.getEmail());
 
-        //Imposta password fissa e confermata
         authService.setUserPasswordPermanent(nuovoAgenteDto.getEmail(), "DefaultPass123!");
-        
+        authService.addUserToGroup(nuovoAgenteDto.getEmail(), "Agenti");
+
         Agente agente = utenteMapper.toAgenteEntity(nuovoAgenteDto);
-        agente.setAgenzia(gestore.getAgenzia());    
         agente.setIdUtente(UUID.fromString(cognitoSub));
+        agente.setAgenzia(gestore.getAgenzia());
+        agente.setRuolo("AGENTE");
+
         Agente salvato = agenteRepo.save(agente);
+        
         return utenteMapper.toAgenteDTO(salvato);
     }
 }
