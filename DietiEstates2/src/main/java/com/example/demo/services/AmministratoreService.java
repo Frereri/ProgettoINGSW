@@ -14,47 +14,56 @@ import com.example.demo.models.Agenzia;
 import com.example.demo.models.Gestore;
 import com.example.demo.models.SupportoAmministratore;
 import com.example.demo.repositories.AgenziaRepo;
-import com.example.demo.repositories.GestoreRepo;
-import com.example.demo.repositories.SupportoRepo;
+import com.example.demo.repositories.UtenteRepo;
 
 @Service
 public class AmministratoreService {
 
-    @Autowired
-    private GestoreRepo gestoreRepo;
+	@Autowired
+    private UtenteRepo utenteRepo;
+
     @Autowired
     private AgenziaRepo agenziaRepo;
-    @Autowired
-    private SupportoRepo supportoRepo;
+
     @Autowired
     private IUtenteMapper utenteMapper;
     
     @Autowired
     private AuthService authService;
 
-    public GestoreDTO creaGestore(GestoreDTO gestoreDto, Integer idAgenzia) {
-        Agenzia agenzia = agenziaRepo.findById(idAgenzia)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Agenzia non trovata"));
-
-        String cognitoSub = authService.adminCreateUser(gestoreDto.getEmail());
-
-        //Imposta password fissa e confermata
-        authService.setUserPasswordPermanent(gestoreDto.getEmail(), "DefaultPass123!");
+    public GestoreDTO creaGestore(GestoreDTO dto) {
+    	System.out.println("1. Inizio creazione Gestore per email: " + dto.getEmail());
+        // 1. Creazione su Cognito
+        String sub = authService.adminCreateUser(dto.getEmail());
+        System.out.println("2. Creato su Cognito con SUB: " + sub);
+        authService.setUserPasswordPermanent(dto.getEmail(), "DefaultPass123!");
+        authService.addUserToGroup(dto.getEmail(), "Gestori");
+        System.out.println("3. Aggiunto al gruppo Gestori");
+        // 2. Salvataggio su DB
+        Gestore gestore = utenteMapper.toGestoreEntity(dto);
+        gestore.setIdUtente(UUID.fromString(sub));
+        gestore.setRuolo("GESTORE");
+        System.out.println("4. Mapping completato");
         
-        Gestore gestore = utenteMapper.toGestoreEntity(gestoreDto);
-        gestore.setAgenzia(agenzia);     
-        gestore.setIdUtente(UUID.fromString(cognitoSub));
-        return utenteMapper.toGestoreDTO(gestoreRepo.save(gestore));
+        // Collega l'agenzia passata nel DTO
+        Agenzia agenzia = agenziaRepo.findById(dto.getIdAgenzia())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Agenzia non trovata"));
+        gestore.setAgenzia(agenzia);
+        Gestore salvato = utenteRepo.save(gestore);
+        System.out.println("5. Salvataggio su DB completato con successo!");
+
+        return utenteMapper.toGestoreDTO(salvato);
     }
 
-    public SupportoAmministratoreDTO creaSupporto(SupportoAmministratoreDTO supportoDto) {
-        String cognitoSub = authService.adminCreateUser(supportoDto.getEmail());
+    public SupportoAmministratoreDTO creaSupporto(SupportoAmministratoreDTO dto) {
+        String sub = authService.adminCreateUser(dto.getEmail());
+        authService.setUserPasswordPermanent(dto.getEmail(), "DefaultPass123!");
+        authService.addUserToGroup(dto.getEmail(), "Supporto");
 
-        //Imposta password fissa e confermata
-        authService.setUserPasswordPermanent(supportoDto.getEmail(), "DefaultPass123!");
-        
-        SupportoAmministratore supporto = utenteMapper.toSupportoAmministratoreEntity(supportoDto);
-        supporto.setIdUtente(UUID.fromString(cognitoSub));
-        return utenteMapper.toSupportoAmministratoreDTO(supportoRepo.save(supporto));
+        SupportoAmministratore supporto = utenteMapper.toSupportoAmministratoreEntity(dto);
+        supporto.setIdUtente(UUID.fromString(sub));
+        supporto.setRuolo("SUPPORTO_AMMINISTRATORE");
+
+        return utenteMapper.toSupportoAmministratoreDTO(utenteRepo.save(supporto));
     }
 }

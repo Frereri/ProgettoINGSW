@@ -3,9 +3,10 @@ package com.example.demo.controllers;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,13 +21,17 @@ public class GestoreController {
 
     @Autowired
     private GestoreService gestoreService;
-
-    @PostMapping("/{idGestore}/crea-agente")
-    public ResponseEntity<AgenteDTO> creaAgente(
-            @PathVariable UUID idGestore, 
-            @RequestBody AgenteDTO agenteDTO) {
+    
+    @PostMapping("/registra-agente")
+    @PreAuthorize("hasAuthority('Gestori')")
+    public ResponseEntity<?> registraAgente(
+            @AuthenticationPrincipal Jwt jwt, 
+            @RequestBody AgenteDTO dto) {
         
-        AgenteDTO creato = gestoreService.creaAgente(idGestore, agenteDTO);
-        return new ResponseEntity<>(creato, HttpStatus.CREATED);
+        // Estraiamo l'UUID dal token (il 'sub' di Cognito)
+        UUID idGestore = UUID.fromString(jwt.getSubject());
+        
+        AgenteDTO creato = gestoreService.creaAgente(idGestore, dto);
+        return ResponseEntity.ok(creato);
     }
 }

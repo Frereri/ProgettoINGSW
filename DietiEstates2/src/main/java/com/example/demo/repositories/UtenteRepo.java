@@ -21,4 +21,8 @@ public interface UtenteRepo extends JpaRepository<Utente, UUID>{
     boolean existsByEmail(String email);
 
     @Query("SELECT u FROM Utente u WHERE u.agenzia.idAgenzia = :id")
-    List<Utente> findAllByAgenzia(@Param("id") Integer id);}
+    List<Utente> findAllByAgenzia(@Param("id") Integer id);
+    
+    Optional<Utente> findByIdUtente(UUID idUtente);
+    
+}

@@ -5,10 +5,16 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.example.demo.models.Offerta;
 import com.example.demo.models.StoricoOfferta;
 
 @Repository
 public interface StoricoRepo extends JpaRepository<StoricoOfferta, Integer> {
 
 	List<StoricoOfferta> findByOffertaIdOffertaOrderByDataAzioneDesc(Integer idOfferta);
+
+	List<StoricoOfferta> findByOfferta(Offerta offerta);
+
+	List<StoricoOfferta> findByOffertaOrderByIdLogDesc(Offerta offerta);
+
 }

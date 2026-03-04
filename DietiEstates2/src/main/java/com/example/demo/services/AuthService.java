@@ -1,9 +1,15 @@
 package com.example.demo.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.example.demo.DTO.RegistrazioneClienteDTO;
+import com.example.demo.mapper.IUtenteMapper;
+import com.example.demo.models.Cliente;
+import com.example.demo.repositories.UtenteRepo;
 
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -15,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -34,6 +41,12 @@ public class AuthService {
     private String userPoolId;
 
     private final CognitoIdentityProviderClient cognitoClient;
+    
+    @Autowired
+    private UtenteRepo utenteRepo;
+    
+    @Autowired
+    private IUtenteMapper utenteMapper;
 
     public AuthService(
     	    @Value("${aws.region}") String region,
@@ -69,6 +82,42 @@ public class AuthService {
         return response.userSub(); // Questo è l'UUID che useremo nel nostro DB
     }
     
+    public void registraCliente(RegistrazioneClienteDTO dto) {
+
+    	if (dto.getDatiProfilo() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "I dati del profilo sono obbligatori");
+        }
+    	
+    	String email = dto.getDatiProfilo().getEmail();
+        String sub = this.signUp(email, dto.getPassword());
+
+        AdminConfirmSignUpRequest confirmRequest = AdminConfirmSignUpRequest.builder()
+                .userPoolId(userPoolId)
+                .username(dto.getDatiProfilo().getEmail())
+                .build();
+        
+        cognitoClient.adminConfirmSignUp(confirmRequest);
+        
+        // 2. Aggiunta al gruppo Clienti
+        this.addUserToGroup(email, "Clienti");
+
+        // 3. Salvataggio nel DB locale
+        Cliente cliente = utenteMapper.toClienteEntity(dto.getDatiProfilo());
+        cliente.setIdUtente(UUID.fromString(sub));
+        cliente.setRuolo("CLIENTE");
+        
+        utenteRepo.save(cliente);
+    }
+    
+    public void addUserToGroup(String email, String groupName) {
+        AdminAddUserToGroupRequest groupRequest = AdminAddUserToGroupRequest.builder()
+                .userPoolId(userPoolId)
+                .username(email)
+                .groupName(groupName)
+                .build();
+        cognitoClient.adminAddUserToGroup(groupRequest);
+    }
+    
     public String adminCreateUser(String email) {
         AdminCreateUserRequest request = AdminCreateUserRequest.builder()
                 .userPoolId(userPoolId)
@@ -77,10 +126,12 @@ public class AuthService {
                     AttributeType.builder().name("email").value(email).build(),
                     AttributeType.builder().name("email_verified").value("true").build()
                 )
-                .desiredDeliveryMediums(DeliveryMediumType.EMAIL) // Invia password temporanea
+                .messageAction(MessageActionType.SUPPRESS)
                 .build();
 
         AdminCreateUserResponse response = cognitoClient.adminCreateUser(request);
+        
+        this.setUserPasswordPermanent(email, "DefaultPass123!");
         return response.user().attributes().stream()
                 .filter(a -> a.name().equals("sub"))
                 .findFirst()
@@ -126,7 +177,11 @@ public class AuthService {
             
             return tokens; 
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenziali non valide");
+            // STAMPA L'ERRORE REALE NELLA CONSOLE DI ECLIPSE
+            System.err.println("ERRORE COGNITO LOGIN: " + e.getMessage());
+            e.printStackTrace(); 
+            
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenziali non valide: " + e.getMessage());
         }
     }
     

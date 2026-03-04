@@ -6,8 +6,14 @@ const API_URL = "http://localhost:8080/api/immobile";
 class ImmobileService {
     
     // Metodo per ottenere tutti gli immobili
-    getAllImmobili() {
-        return axios.get(API_URL);
+    getAllImmobili(page = 0, size = 10) {
+        // Inviamo i parametri come query string: ?page=0&size=10
+        return axios.get(`${API_URL}`, {
+            params: {
+                page: page,
+                size: size
+            }
+        });
     }
 
     // Metodo per ottenere un singolo immobile per ID

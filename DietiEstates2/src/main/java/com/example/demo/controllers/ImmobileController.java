@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 
 @CrossOrigin(origins = "*")
@@ -27,14 +29,14 @@ public class ImmobileController {
 	@Autowired
     private ImmobileService service;
 
-    @GetMapping
-    public ResponseEntity<List<ImmobileDTO>> getAll() {
-        List<ImmobileDTO> immobili = service.getAllImmobili();
-        if (immobili.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(immobili);
-    }
+	@GetMapping
+	public ResponseEntity<List<ImmobileDTO>> getAllImmobili(
+	        @RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "10") int size) {
+	    
+	    Pageable pageable = PageRequest.of(page, size);
+	    return ResponseEntity.ok(service.getAllImmobili(pageable).getContent());
+	}
 
     @GetMapping("/cerca")
     public ResponseEntity<List<ImmobileDTO>> search(

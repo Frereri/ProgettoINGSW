@@ -2,6 +2,9 @@ package com.example.demo.models;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,10 +33,12 @@ public class Offerta {
     @Column(name = "offerta_esterna")
     private boolean offertaEsterna = false;
 
-    @Column(name = "data_creazione", insertable = false, updatable = false)
+    @Column(name = "data_creazione", updatable = false)
+    @CreationTimestamp
     private LocalDateTime dataCreazione;
 
     @Column(name = "data_ultimo_aggiornamento")
+    @UpdateTimestamp
     private LocalDateTime dataUltimoAggiornamento;
 
     @Column(name = "prezzo_controfferta")
@@ -47,7 +52,7 @@ public class Offerta {
 
     @ManyToOne
     @JoinColumn(name = "id_cliente")
-    private Cliente cliente;
+    private Utente cliente;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_immobile", nullable = false)
@@ -59,7 +64,7 @@ public class Offerta {
 
 	public Offerta(Integer idOfferta, double prezzoOfferto, double prezzoOriginale, String stato,
 			boolean offertaEsterna, LocalDateTime dataCreazione, LocalDateTime dataUltimoAggiornamento,
-			Double prezzoControfferta, String nomeClienteEsterno, String contattoClienteEsterno, Cliente cliente,
+			Double prezzoControfferta, String nomeClienteEsterno, String contattoClienteEsterno, Utente cliente,
 			Immobile immobile) {
 		super();
 		this.idOfferta = idOfferta;
@@ -156,11 +161,11 @@ public class Offerta {
 		this.contattoClienteEsterno = contattoClienteEsterno;
 	}
 
-	public Cliente getCliente() {
+	public Utente getCliente() {
 		return cliente;
 	}
 
-	public void setCliente(Cliente cliente) {
+	public void setCliente(Utente cliente) {
 		this.cliente = cliente;
 	}
 

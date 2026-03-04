@@ -44,11 +44,15 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
         		.requestMatchers("/api/immobile/**").permitAll()
+        		.requestMatchers("/api/agenzia/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/error").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                 .requestMatchers("/api/agente/**").hasAuthority("AGENTE")
                 .requestMatchers("/api/admin/**").hasAuthority("AMMINISTRATORE")
                 .requestMatchers("/api/cliente/**").hasAuthority("CLIENTE")
+                .requestMatchers("/api/gestore/**").hasAuthority("GESTORE")
+//                .requestMatchers("/api/supporto-amministratore/**").hasAuthority("SUPPORTO_AMMINISTRATORE")
                 .anyRequest().authenticated()
             )
             
@@ -69,6 +73,8 @@ public class SecurityConfig {
             // Assicurati che nel DB l'ID sia un UUID
             return utenteRepo.findById(UUID.fromString(cognitoSub))
                 .map(utente -> {
+                	
+                	System.out.println("RUOLO TROVATO NEL DB: " + utente.getRuolo().toString());
                     // 3. Prendiamo il ruolo dal DB (es. "AGENTE")
                     // Se il tuo ruolo nel DB è un Enum, usa utente.getRuolo().name()
                     List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(utente.getRuolo().toString()));
@@ -83,7 +89,7 @@ public class SecurityConfig {
 	CorsConfigurationSource corsConfigurationSource() {
 	    CorsConfiguration configuration = new CorsConfiguration();
 	    configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-	    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+	    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 	    configuration.setAllowedHeaders(Arrays.asList("*"));
 	    configuration.setAllowCredentials(true);
 	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
