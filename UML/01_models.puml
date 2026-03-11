@@ -1,0 +1,133 @@
+@startuml DietiEstates2_Models
+
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor White
+  BorderColor #333
+  ArrowColor #555
+}
+
+package "models" #LightYellow {
+
+  abstract class Utente {
+    - idUtente : UUID
+    - nome : String
+    - cognome : String
+    - email : String
+    - ruolo : String
+  }
+
+  class Agente {
+    - agenzia : Agenzia
+    - immobili : List<Immobile>
+  }
+
+  class Cliente {
+    - offerte : List<Offerta>
+  }
+
+  class Gestore {
+    - agenzia : Agenzia
+  }
+
+  class Amministratore {
+  }
+
+  class SupportoAmministratore {
+  }
+
+  class Agenzia {
+    - idAgenzia : Integer
+    - nomeAgenzia : String
+    - partitaIva : String
+  }
+
+  abstract class Immobile {
+    - idImmobile : Integer
+    - titolo : String
+    - citta : String
+    - provincia : String
+    - indirizzo : String
+    - prezzo : double
+    - descrizione : String
+    - numeroStanze : Integer
+    - classeEnergetica : String
+    - tipoContratto : String
+    - tipoAffitto : String
+    - superficie : double
+    - stato : String
+    - climatizzazione : boolean
+    - boxAuto : boolean
+    - terrazzo : boolean
+    - latitudine : Double
+    - longitudine : Double
+    - vicinoScuole : boolean
+    - vicinoParchi : boolean
+    - vicinoTrasporti : boolean
+  }
+
+  class Appartamento {
+    - piano : Integer
+    - ascensore : boolean
+    - portineria : boolean
+  }
+
+  class Villa {
+    - superficieGiardino : double
+    - giardino : boolean
+    - piscina : boolean
+  }
+
+  class Offerta {
+    - idOfferta : Integer
+    - prezzoOfferto : double
+    - prezzoOriginale : double
+    - stato : String
+    - offertaEsterna : boolean
+    - dataCreazione : LocalDateTime
+    - dataUltimoAggiornamento : LocalDateTime
+    - prezzoControfferta : Double
+    - nomeClienteEsterno : String
+    - contattoClienteEsterno : String
+  }
+
+  class StoricoOfferta {
+    - idLog : Integer
+    - statoPrecedente : String
+    - nuovoStato : String
+    - prezzoScambiato : Double
+    - nota : String
+    - dataAzione : LocalDateTime
+    - autoreAzione : UUID
+  }
+
+  class ImmobileImmagine {
+    - idImmagine : Integer
+    - urlImmagine : String
+    - isCopertina : boolean
+  }
+
+  ' Ereditarietà Utente
+  Utente <|-- Agente
+  Utente <|-- Cliente
+  Utente <|-- Gestore
+  Utente <|-- Amministratore
+  Utente <|-- SupportoAmministratore
+
+  ' Ereditarietà Immobile
+  Immobile <|-- Appartamento
+  Immobile <|-- Villa
+
+  ' Relazioni
+  Agenzia "1" o-- "0..*" Agente
+  Agenzia "1" o-- "0..*" Immobile
+  Agente "1" o-- "0..*" Immobile
+  Immobile "1" o-- "0..*" Offerta
+  Immobile "1" o-- "0..*" ImmobileImmagine
+  Cliente "1" o-- "0..*" Offerta
+  Offerta "1" o-- "0..*" StoricoOfferta
+}
+
+@enduml
