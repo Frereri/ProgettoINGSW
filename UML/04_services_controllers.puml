@@ -1,0 +1,183 @@
+@startuml DietiEstates2_Services_Controllers
+
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor White
+  BorderColor #333
+  ArrowColor #555
+}
+
+package "services" #LightPink {
+
+  class AuthService {
+    + login(email, password) : Map<String,String>
+    + signUp(email, password) : String
+    + registraCliente(dto) : void
+    + adminCreateUser(email) : String
+    + addUserToGroup(email, group) : void
+    + setUserPasswordPermanent(email, pwd) : void
+    + confirmUser(email) : void
+    + updatePassword(token, old, new) : void
+  }
+
+  class UtenteService {
+    + findAll() : List<UtenteDTO>
+    + findById(id) : UtenteDTO
+    + delete(id) : void
+    + registraCliente(dto) : UtenteDTO
+    + creaStaff(dto) : UtenteDTO
+  }
+
+  class AgenziaService {
+    + findAll() : List<AgenziaDTO>
+    + findById(id) : AgenziaDTO
+    + save(dto) : AgenziaDTO
+    + delete(id) : void
+  }
+
+  class AmministratoreService {
+    + creaGestore(dto) : GestoreDTO
+    + creaSupporto(dto) : SupportoAmministratoreDTO
+  }
+
+  class GestoreService {
+    + creaAgente(idGestore, dto) : AgenteDTO
+  }
+
+  class AgenteService {
+    + getProfiloAgente(id) : AgenteDTO
+    + caricaImmobile(dto, idAgente) : ImmobileDTO
+    + aggiornaImmobile(id, dto) : ImmobileDTO
+    + inserisciOffertaEsterna(dto, idImmobile) : OffertaDTO
+    + gestisciOfferta(id, stato, prezzo, nota, idAgente) : OffertaDTO
+    + getOffertePerAgente(id) : List<OffertaDTO>
+    + getOfferteAttivePerAgente(id) : List<OffertaDTO>
+    + getStoricoOfferta(id, idAgente) : List<StoricoOffertaDTO>
+  }
+
+  class ClienteService {
+    + inviaOfferta(dto, idCliente) : OffertaDTO
+    + aggiornaStatoOfferta(id, idCliente, stato) : OffertaDTO
+    + getOffertePerCliente(id) : List<OffertaDTO>
+  }
+
+  class ImmobileService {
+    + getAllImmobili(pageable) : Page<ImmobileDTO>
+    + getImmobileById(id) : ImmobileDTO
+    + searchImmobili(citta, min, max, contratto) : List<ImmobileDTO>
+    + saveImmobileFromDTO(dto) : ImmobileDTO
+    + deleteImmobile(id) : void
+  }
+
+  class OffertaService {
+    + createOfferta(dto) : OffertaDTO
+    + aggiornaStato(id, stato, controfferta) : OffertaDTO
+    + findAll() : List<OffertaDTO>
+    + findByCliente(id) : List<OffertaDTO>
+    + getOffertePerImmobile(id) : List<OffertaDTO>
+    + getOffertePerAgente(id) : List<OffertaDTO>
+  }
+
+  class ImmagineService {
+    + aggiungiImmagine(id, url, copertina) : ImmobileImmagineDTO
+    + eliminaImmagine(id) : void
+  }
+
+  class GeoService {
+    + getCoordinates(address) : Map<String,Double>
+    + isNear(lat, lon, category) : boolean
+  }
+
+  ' Dipendenze tra service
+  AmministratoreService --> AuthService
+  GestoreService --> AuthService
+  AgenteService --> GeoService
+  ImmobileService --> GeoService
+  UtenteService --> AuthService
+}
+
+package "controllers" #Lavender {
+
+  class AuthController {
+    POST /api/auth/login
+    POST /api/auth/signup-cliente
+    POST /api/auth/setup-admin
+  }
+
+  class UtenteController {
+    GET    /api/utente
+    GET    /api/utente/{id}
+    DELETE /api/utente/{id}
+    POST   /api/utente/update-password
+  }
+
+  class AgenziaController {
+    GET    /api/agenzia
+    GET    /api/agenzia/{id}
+    POST   /api/agenzia
+    DELETE /api/agenzia/{id}
+  }
+
+  class AmministratoreController {
+    POST /api/amministratore/registra-gestore
+    POST /api/amministratore/registra-supporto
+  }
+
+  class GestoreController {
+    POST /api/gestore/registra-agente
+  }
+
+  class AgenteController {
+    GET   /api/agente/profilo
+    GET   /api/agente/offerte/tutte
+    GET   /api/agente/offerte/attive
+    POST  /api/agente/immobili
+    PUT   /api/agente/aggiorna-immobile/{id}
+    POST  /api/agente/immobili/{id}/offerta-esterna
+    PATCH /api/agente/offerte/{id}
+  }
+
+  class ClienteController {
+    POST  /api/cliente/offerte/crea
+    PATCH /api/cliente/offerte/{id}/rispondi
+    GET   /api/cliente/mie-offerte
+  }
+
+  class ImmobileController {
+    GET    /api/immobile
+    GET    /api/immobile/cerca
+    GET    /api/immobile/{id}
+    POST   /api/immobile
+    DELETE /api/immobile/{id}
+  }
+
+  class OffertaController {
+    GET   /api/offerta
+    GET   /api/offerta/immobile/{id}
+    GET   /api/offerta/cliente/{id}
+    POST  /api/offerta
+    PATCH /api/offerta/{id}/stato
+  }
+
+  class ImmagineController {
+    POST   /api/immobile/immagine/{id}
+    DELETE /api/immobile/immagine/{id}
+  }
+
+  ' Controller -> Service
+  AuthController --> AuthService
+  UtenteController --> UtenteService
+  UtenteController --> AuthService
+  AgenziaController --> AgenziaService
+  AmministratoreController --> AmministratoreService
+  GestoreController --> GestoreService
+  AgenteController --> AgenteService
+  ClienteController --> ClienteService
+  ImmobileController --> ImmobileService
+  OffertaController --> OffertaService
+  ImmagineController --> ImmagineService
+}
+
+@enduml
