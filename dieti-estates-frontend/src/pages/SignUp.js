@@ -11,29 +11,38 @@ const SignUp = () => {
         cognome: '',
     });
     const [showPassword, setShowPassword] = useState(false);
+    const [errore, setErrore] = useState('');       // <-- aggiunto
+    const [successo, setSuccesso] = useState('');   // <-- aggiunto
     const navigate = useNavigate();
 
     const handleSignUp = async (e) => {
         e.preventDefault();
+        setErrore('');
+        setSuccesso('');
         
         const payload = {
             password: formData.password,
             datiProfilo: {
                 email: formData.email,
                 nome: formData.nome,
-                cognome: formData.cognome
+                cognome: formData.cognome,
+                ruolo: "CLIENTE"
             }
         };
 
         try {
             await axios.post('http://localhost:8080/api/auth/signup-cliente', payload);
-            alert("Registrazione effettuata! Controlla l'email per confermare l'account su Cognito.");
-            navigate('/login');
+            setSuccesso("Registrazione effettuata! Controlla l'email per confermare l'account.");
+            setTimeout(() => navigate('/login'), 2000);
         } catch (error) {
-            // Logghiamo l'errore per vedere se mancano campi obbligatori nel DTO
-            console.error("Dettagli errore backend:", error.response?.data);
-            const messaggio = error.response?.data || error.message;
-            alert("Errore registrazione: " + messaggio);
+            const codice = error.response?.data?.message;
+            if (codice === "EMAIL_GIA_ESISTENTE") {
+                setErrore("Questa email è già registrata. Prova ad accedere.");
+            } else if (codice === "PASSWORD_NON_VALIDA") {
+                setErrore("La password deve avere almeno 8 caratteri, una maiuscola e un numero.");
+            } else {
+                setErrore("Errore durante la registrazione. Riprova più tardi.");
+            }
         }
     };
 
@@ -80,6 +89,10 @@ const SignUp = () => {
                             {showPassword ? "NASCONDI" : "MOSTRA"}
                         </span>
                     </div>
+
+                    {/* Messaggi errore/successo */}
+                    {errore && <p style={erroreStyle}>{errore}</p>}
+                    {successo && <p style={successoStyle}>{successo}</p>}
                     
                     <button type="submit" style={buttonStyle}>Registrati</button>
                 </form>
@@ -104,5 +117,7 @@ const buttonStyle = { backgroundColor: '#2C3E50', color: 'white', border: 'none'
 const toggleStyle = { position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', fontSize: '0.65rem', color: '#A0AEC0', fontWeight: '800' };
 const footerTextStyle = { marginTop: '20px', fontSize: '0.9rem', color: '#718096' };
 const linkStyle = { color: '#3498DB', cursor: 'pointer', fontWeight: '600' };
+const erroreStyle = { color: '#E53E3E', backgroundColor: '#FFF5F5', border: '1px solid #FEB2B2', borderRadius: '8px', padding: '10px', fontSize: '0.9rem' };
+const successoStyle = { color: '#276749', backgroundColor: '#F0FFF4', border: '1px solid #9AE6B4', borderRadius: '8px', padding: '10px', fontSize: '0.9rem' };
 
 export default SignUp;
