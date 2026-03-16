@@ -11,7 +11,7 @@ import StoricoOffertaDettaglio from './components/agenteDashboard/StoricoOfferta
 import OfferteTabellaAgente from './components/agenteDashboard/OfferteTabellaAgente';
 import SignUp from './pages/SignUp';
 import ChangePasswordForm from './components/ChangePasswordForm';
-import { PropertyForm } from './components/PropertyForm';
+import NuovoImmobilePage from './components/agenteDashboard/NuovoImmobilePage';
 
 
 function App() {
@@ -24,7 +24,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/agente" element={<AgenteDashboard />} />
         <Route path="/cambio-password" element={<ChangePasswordForm />} />
-        <Route path="/nuovo-immobile" element={<PropertyForm />} />
+        <Route path="/nuovo-immobile" element={<NuovoImmobilePage />} />
         <Route path="/amministratore" element={<AdminDashboard />} />
         <Route path="/supporto" element={<AdminDashboard />} />
         <Route path="/gestore" element={<GestoreDashboard />} />
