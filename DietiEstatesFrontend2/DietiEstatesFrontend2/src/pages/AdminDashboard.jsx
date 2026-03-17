@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signOut, fetchAuthSession, updatePassword } from 'aws-amplify/auth';
+import { signOut, fetchAuthSession } from 'aws-amplify/auth';
 import axios from 'axios';
 
 import Logo from '../components/Logo';
@@ -147,8 +147,6 @@ const AdminDashboard = () => {
         navigate('/');
     };
 
-    if (loading) return <div style={loadingContainerStyle}>Caricamento in corso...</div>;
-
     const handlePasswordUpdate = async (pwData) => {
         try {
             await updatePassword({
@@ -170,6 +168,9 @@ const AdminDashboard = () => {
             throw err; 
         }
     };
+
+
+    if (loading) return <div style={loadingContainerStyle}>Caricamento in corso...</div>;
 
     return (
         <div style={adminContainerStyle}>
@@ -282,7 +283,7 @@ const AdminDashboard = () => {
 
                     {view === 'changePassword' && (
                         <div style={centerFormWrapper}>
-                            <ChangePasswordForm styles={dashboardFormStyles} onUpdate={handlePasswordUpdate} />
+                            <ChangePasswordForm styles={dashboardFormStyles} onUpdate={(handlePasswordUpdate) } />
                         </div>
                     )}
 

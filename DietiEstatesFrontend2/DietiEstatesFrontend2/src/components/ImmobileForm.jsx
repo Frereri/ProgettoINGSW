@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { fetchAuthSession } from 'aws-amplify/auth';
+import Toast from './Toast/Toast';
+import { useToast } from './Toast/useToast';
 
 const ImmobileForm = ({ initialData, styles, onSave, isGestore = false }) => {
     const [agenti, setAgenti] = useState([]);
     const [loading, setLoading] = useState(false);
+    const { toastProps, showToast } = useToast();
     const [formData, setFormData] = useState({
         titolo: '',
         prezzo: 0,
@@ -146,18 +149,19 @@ const ImmobileForm = ({ initialData, styles, onSave, isGestore = false }) => {
                 }
             });
 
-            alert("Salvataggio completato!");
-            if (onSave) onSave();
+            showToast("Salvataggio completato!","success");
+            if (onSave) setTimeout(onSave, 2000);
 
         } catch (err) {
             console.error("Dettaglio Errore:", err.response?.data);
-            alert("Errore: " + (err.response?.data?.message || "Errore durante il salvataggio"));
+            showToast(err.response?.data?.message || "Errore durante il salvataggio","error");
         } finally {
             setLoading(false);
         }
     };
 
     return (
+        <> 
         <div style={styles.formCardStyle}>
             <h3 style={{ color: '#2C3E50', textAlign: 'center' }}>
                 {formData.idImmobile ? 'Modifica Immobile' : 'Nuovo Annuncio'}
@@ -172,7 +176,7 @@ const ImmobileForm = ({ initialData, styles, onSave, isGestore = false }) => {
                     </div>
                     <div style={{ flex: 1 }}>
                         <label style={labelStyle}>Prezzo (€)</label>
-                        <input name="prezzo" type="number" style={styles.inputStyle} value={formData.prezzo} onChange={handleChange} required />
+                        <input name="prezzo" type="number" min={1} style={styles.inputStyle} value={formData.prezzo} onChange={handleChange} required />
                     </div>
                 </div>
 
@@ -196,23 +200,23 @@ const ImmobileForm = ({ initialData, styles, onSave, isGestore = false }) => {
                 <div style={gridStyle}>
                     <div>
                         <label style={labelStyle}>Mq</label>
-                        <input name="superficie" type="number" style={styles.inputStyle} value={formData.superficie} onChange={handleChange} />
+                        <input name="superficie" type="number" min={28} style={styles.inputStyle} value={formData.superficie} onChange={handleChange} required/>
                     </div>
                     <div>
                         <label style={labelStyle}>Stanze</label>
-                        <input name="numeroStanze" type="number" style={styles.inputStyle} value={formData.numeroStanze} onChange={handleChange} />
+                        <input name="numeroStanze" type="number" min={1} style={styles.inputStyle} value={formData.numeroStanze} onChange={handleChange} required/>
                     </div>
                     <div>
                         <label style={labelStyle}>Letti</label>
-                        <input name="numeroLetti" type="number" style={styles.inputStyle} value={formData.numeroLetti} onChange={handleChange} />
+                        <input name="numeroLetti" type="number" min={1} style={styles.inputStyle} value={formData.numeroLetti} onChange={handleChange} required/>
                     </div>
                     <div>
                         <label style={labelStyle}>Bagni</label>
-                        <input name="numeroBagni" type="number" style={styles.inputStyle} value={formData.numeroBagni} onChange={handleChange} />
+                        <input name="numeroBagni" type="number" min={1} style={styles.inputStyle} value={formData.numeroBagni} onChange={handleChange} required/>
                     </div>
                     <div>
                         <label style={labelStyle}>Classe Energetica</label>
-                        <select name="classeEnergetica" style={styles.inputStyle} value={formData.classeEnergetica} onChange={handleChange}>
+                        <select name="classeEnergetica" style={styles.inputStyle} value={formData.classeEnergetica} onChange={handleChange} required>
                             <option value="">Seleziona...</option>
                             <option value="A4">A4</option><option value="A">A</option><option value="B">B</option>
                             <option value="C">C</option><option value="D">D</option><option value="E">E</option>
@@ -258,7 +262,7 @@ const ImmobileForm = ({ initialData, styles, onSave, isGestore = false }) => {
                     {formData.tipoImmobile === 'APPARTAMENTO' && (
                         <div style={{ marginTop: '10px', display: 'flex', gap: '20px', alignItems: 'center' }}>
                             <label style={labelStyle}>Piano</label>
-                            <input name="piano" type="number" style={{...styles.inputStyle, width: '80px'}} value={formData.piano} onChange={handleChange} />
+                            <input name="piano" type="number" min={0} style={{...styles.inputStyle, width: '80px'}} value={formData.piano} onChange={handleChange} />
                             <label style={checkboxLabel}><input type="checkbox" name="ascensore" checked={formData.ascensore} onChange={handleChange} /> Ascensore</label>
                             <label style={checkboxLabel}><input type="checkbox" name="portineria" checked={formData.portineria} onChange={handleChange} /> Portineria</label>
                         </div>
@@ -277,7 +281,7 @@ const ImmobileForm = ({ initialData, styles, onSave, isGestore = false }) => {
                     {formData.tipoContratto === 'AFFITTO' && (
                         <div style={{ flex: 1 }}>
                             <label style={labelStyle}>Tipo Affitto</label>
-                            <select name="tipoAffitto" style={styles.inputStyle} value={formData.tipoAffitto} onChange={handleChange}>
+                            <select name="tipoAffitto" style={styles.inputStyle} value={formData.tipoAffitto} onChange={handleChange} required>
                                 <option value="">Seleziona...</option>
                                 <option value="GIORNALIERO">Giornaliero</option>
                                 <option value="MENSILE">Mensile</option>
@@ -330,7 +334,8 @@ const ImmobileForm = ({ initialData, styles, onSave, isGestore = false }) => {
                     {loading && <div className="loading-spinner"></div>}
                     {loading ? 'Elaborazione...' : (formData.idImmobile ? 'Salva Modifiche' : 'Pubblica Immobile')}
                 </button>
-            </form>
+            </form>  
+
             <style>
                 {`
                     .loading-spinner {
@@ -345,8 +350,10 @@ const ImmobileForm = ({ initialData, styles, onSave, isGestore = false }) => {
                         to { transform: rotate(360deg); }
                     }
                 `}
-                </style>
+                </style>  
         </div>
+        <Toast {...toastProps} />
+        </>
     );
 };
 

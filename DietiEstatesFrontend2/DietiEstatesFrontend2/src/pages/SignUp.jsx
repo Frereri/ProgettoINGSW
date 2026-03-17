@@ -43,12 +43,16 @@ const SignUp = () => {
             });
             setTimeout(() => navigate('/login'), 3000);
         } catch (error) {
-            const msg = error.response?.data?.message;
+            const msg = error.response?.data?.error;
             let erroreTesto = "Errore durante la registrazione. Riprova più tardi.";
+     
+            if (msg === "Email già esistente") 
+                erroreTesto = "Questa email è già registrata.";
+            else if (msg === "Password non valida") 
+                erroreTesto = "La password deve contenere almeno 8 caratteri, una maiuscola e un numero.";
             
-            if (msg === "EMAIL_GIA_ESISTENTE") erroreTesto = "Questa email è già registrata.";
-            else if (msg === "PASSWORD_NON_VALIDA") erroreTesto = "La password deve contenere almeno 8 caratteri, una maiuscola e un numero.";
-            
+          
+
             setFeedback({ tipo: 'error', testo: erroreTesto });
         } finally {
             setLoading(false);
