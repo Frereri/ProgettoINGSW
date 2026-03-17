@@ -2,11 +2,17 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import ImmobileForm from './ImmobileForm';
+import Toast from './Toast/Toast';
+import { useToast } from './Toast/useToast';
+import ConfirmModal from './ConfirmModal';
 
 const ListaImmobili = ({ styles, apiUrl }) => {
     const [immobili, setImmobili] = useState([]);
     const [editingProperty, setEditingProperty] = useState(null);
     const [loading, setLoading] = useState(false);
+    const { toastProps, showToast } = useToast();
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
 
     const fetchImmobili = useCallback(async () => {
         if (!apiUrl) return;
@@ -30,20 +36,24 @@ const ListaImmobili = ({ styles, apiUrl }) => {
         if (apiUrl) fetchImmobili(); 
     }, [fetchImmobili, apiUrl]);
 
+    const askDelete = (id) => {
+        setDeleteId(id);
+        setConfirmOpen(true);
+    };
+
+
     const handleDelete = async (id) => {
-        if (!id) return;
-        if (!window.confirm("Sei sicuro di voler eliminare questo immobile?")) return;
-        
+        if (!id) return;  
         try {
             const session = await fetchAuthSession();
             const token = session.tokens.accessToken.toString();
             await axios.delete(`http://localhost:8080/api/immobile/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            alert("Immobile eliminato correttamente");
+            showToast("Immobile eliminato correttamente","success");
             fetchImmobili();
         } catch (err) { 
-            alert("Errore durante l'eliminazione"); 
+            showToast("Errore durante l'eliminazione","error"); 
         }
     };
 
@@ -70,6 +80,7 @@ const ListaImmobili = ({ styles, apiUrl }) => {
     }
 
     return (
+        <>
         <div style={containerTableStyle}>
             <h3 style={titleStyle}>🏠 Gestione Immobili</h3>
             <table style={tableStyle}>
@@ -109,7 +120,7 @@ const ListaImmobili = ({ styles, apiUrl }) => {
                                         ✏️
                                     </button>
                                     <button 
-                                        onClick={() => handleDelete(imm.idImmobile)} 
+                                        onClick={() => askDelete(imm.idImmobile)} 
                                         style={{ ...actionBtnStyle, color: '#e74c3c' }}
                                         title="Elimina"
                                     >
@@ -122,6 +133,17 @@ const ListaImmobili = ({ styles, apiUrl }) => {
                 </tbody>
             </table>
         </div>
+
+        <ConfirmModal
+            open={confirmOpen}
+            message="Sei sicuro di voler eliminare questo immobile?"
+            onConfirm={() => {
+            setConfirmOpen(false);
+            handleDelete(deleteId);
+                }}onCancel={() => setConfirmOpen(false)}/>
+
+        <Toast {...toastProps} />
+        </>
     );
 };
 

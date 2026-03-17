@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Logo from '../components/Logo';
 import { useNavigate } from 'react-router-dom';
-import { signOut, fetchAuthSession, updatePassword } from 'aws-amplify/auth';
-
+import { signOut, fetchAuthSession,updatePassword} from 'aws-amplify/auth';
 import ImmobileForm from '../components/ImmobileForm';
 import ChangePasswordForm from '../components/ChangePasswordForm';
 import OfferteTabellaAgente from '../components/agente/OfferteTabellaAgente'; 
@@ -48,20 +47,9 @@ const AgenteDashboard = () => {
                 oldPassword: pwData.vecchiaPassword,
                 newPassword: pwData.nuovaPassword
             });
-
-            alert("Password aggiornata con successo!");
-            setView('menu');
-        } catch (err) {
-            console.error("Errore cambio password:", err);
-            
-            if (err.name === 'NotAuthorizedException') {
-                alert("La vecchia password non è corretta.");
-            } else if (err.name === 'LimitExceededException') {
-                alert("Troppi tentativi falliti. Riprova più tardi.");
-            } else {
-                alert("Errore: " + err.message);
-            }
-            
+            return;
+            } catch (err) {
+                console.error("Errore cambio password:", err);
             throw err; 
         }
     };
@@ -127,14 +115,15 @@ const AgenteDashboard = () => {
                     {/* Vista Nuovo Immobile */}
                     {view === 'nuovoImmobile' && (
                         <ImmobileForm 
-                            onSave={() => setView('listaImmobili')} 
+                            onSave={() => setView('menu')} 
                             styles={dashboardFormStyles} 
                             isGestore={false}
                         />
                     )}
 
+
                     {/* Altre viste */}
-                    {view === 'offertaManuale' && <OffertaManualeForm styles={dashboardFormStyles} />}
+                    {view === 'offertaManuale' && <OffertaManualeForm styles={dashboardFormStyles}  onSave={() => setView('menu')} />}
                     {view === 'password' && <ChangePasswordForm styles={dashboardFormStyles} onUpdate={handlePasswordUpdate} />}
                     {view === 'gestioneOfferte' && <OfferteTabellaAgente modo="gestione" onSeeLog={(id) => { setSelectedOffertaId(id); setView('dettaglioLog'); }} />}
                     {view === 'storico' && <OfferteTabellaAgente modo="storico" onSeeLog={(id) => { setSelectedOffertaId(id); setView('dettaglioLog'); }} />}

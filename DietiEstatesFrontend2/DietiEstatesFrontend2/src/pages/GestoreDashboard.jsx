@@ -37,27 +37,17 @@ const GestoreDashboard = () => {
         setView('confermaElimina');
     };
 
+
     const handlePasswordUpdate = async (pwData) => {
         try {
             await updatePassword({
                 oldPassword: pwData.vecchiaPassword,
                 newPassword: pwData.nuovaPassword
             });
-
-            alert("Password aggiornata con successo!");
-            setView('menu');
-        } catch (err) {
-            console.error("Errore durante il cambio password:", err);
-            
-            if (err.name === 'NotAuthorizedException') {
-                alert("La vecchia password non è corretta.");
-            } else if (err.name === 'LimitExceededException') {
-                alert("Troppi tentativi. Riprova più tardi.");
-            } else {
-                alert("Errore: " + err.message);
-            }
-            
-            throw err;
+            return;
+            } catch (err) {
+                console.error("Errore cambio password:", err);
+            throw err; 
         }
     };
 

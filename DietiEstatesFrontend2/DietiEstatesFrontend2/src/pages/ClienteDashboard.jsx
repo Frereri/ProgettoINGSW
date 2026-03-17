@@ -3,14 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { fetchAuthSession, updatePassword, signOut } from 'aws-amplify/auth';
 import Logo from '../components/Logo';
+import ChangePasswordForm from '../components/ChangePasswordForm';
 
 const ClienteDashboard = () => {
     const navigate = useNavigate();
     const [offerte, setOfferte] = useState([]);
     const [view, setView] = useState('offerte');
-    const [pwData, setPwData] = useState({ oldPw: '', newPw: '' });
-    const [showOldPw, setShowOldPw] = useState(false);
-    const [showNewPw, setShowNewPw] = useState(false);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ text: '', type: '' });
 
@@ -40,15 +38,16 @@ const ClienteDashboard = () => {
         } catch (err) { console.error("Logout error:", err); }
     };
 
-    const handleChangePassword = async (e) => {
-        e.preventDefault();
-        setMessage({ text: '', type: '' });
+    const handlePasswordUpdate = async (pwData) => {
         try {
-            await updatePassword({ oldPassword: pwData.oldPw, newPassword: pwData.newPw });
-            setMessage({ text: "Password aggiornata con successo!", type: 'success' });
-            setPwData({ oldPw: '', newPw: '' });
-        } catch (err) { 
-            setMessage({ text: "Errore: " + err.message, type: 'error' }); 
+            await updatePassword({
+                oldPassword: pwData.vecchiaPassword,
+                newPassword: pwData.nuovaPassword
+            });
+            return;
+            } catch (err) {
+                console.error("Errore cambio password:", err);
+            throw err; 
         }
     };
 
@@ -170,45 +169,19 @@ const ClienteDashboard = () => {
                     </div>
                 )}
 
-                {view === 'password' && (
-                    <div style={formContainerStyle}>
-                        <form onSubmit={handleChangePassword} style={formStyle}>
-                            <div style={inputGroupStyle}>
-                                <label style={inputLabelStyle}>Password Attuale</label>
-                                <div style={{ position: 'relative' }}>
-                                    <input 
-                                        type={showOldPw ? "text" : "password"} 
-                                        style={inputStyle} 
-                                        value={pwData.oldPw} 
-                                        onChange={e => setPwData({ ...pwData, oldPw: e.target.value })} 
-                                        required 
-                                    />
-                                    <span onClick={() => setShowOldPw(!showOldPw)} style={eyeToggleStyle}>
-                                        {showOldPw ? "Nascondi" : "Mostra"}
-                                    </span>
-                                </div>
-                            </div>
+ {view === 'password' && (
+    <ChangePasswordForm
+        onUpdate={handlePasswordUpdate}
+        styles={{
+            formCardStyle: formContainerStyle,
+            formStyle: formStyle,
+            inputStyle: inputStyle,
+            eyeToggleStyle: eyeToggleStyle,
+            submitButtonStyle: submitButtonStyle,
+        }}
+    />
+)}
 
-                            <div style={inputGroupStyle}>
-                                <label style={inputLabelStyle}>Nuova Password</label>
-                                <div style={{ position: 'relative' }}>
-                                    <input 
-                                        type={showNewPw ? "text" : "password"} 
-                                        style={inputStyle} 
-                                        value={pwData.newPw} 
-                                        onChange={e => setPwData({ ...pwData, newPw: e.target.value })} 
-                                        required 
-                                    />
-                                    <span onClick={() => setShowNewPw(!showNewPw)} style={eyeToggleStyle}>
-                                        {showNewPw ? "Nascondi" : "Mostra"}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <button type="submit" style={submitButtonStyle}>Aggiorna Credenziali</button>
-                        </form>
-                    </div>
-                )}
             </main>
         </div>
     );

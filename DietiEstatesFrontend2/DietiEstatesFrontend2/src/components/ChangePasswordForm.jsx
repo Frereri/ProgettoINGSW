@@ -1,37 +1,57 @@
 import React, { useState } from 'react';
 
-const ChangePasswordForm = ({ onUpdate, styles }) => {
+const ChangePasswordForm = ({ styles, onUpdate }) => {
     const [pwData, setPwData] = useState({ vecchiaPassword: '', nuovaPassword: '' });
     const [showOldPw, setShowOldPw] = useState(false);
     const [showNewPw, setShowNewPw] = useState(false);
+    const [feedback, setFeedback] = useState(null);
+
     const [loading, setLoading] = useState(false);
     
-    const { 
-        formCardStyle, 
-        formStyle, 
-        inputStyle, 
-        eyeToggleStyle, 
-        submitButtonStyle 
-    } = styles;
+        const { 
+            formCardStyle, 
+            formStyle, 
+            inputStyle, 
+            eyeToggleStyle, 
+            submitButtonStyle 
+        } = styles;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (pwData.nuovaPassword.length < 8) {
-            alert("La nuova password deve contenere almeno 8 caratteri.");
+            setFeedback({ tipo: 'error', testo: "La nuova password deve contenere almeno 8 caratteri." });
             return;
         }
 
         setLoading(true);
         try {
-            await onUpdate(pwData);
+            await onUpdate(pwData);   // <--- QUI È GIUSTO
             setPwData({ vecchiaPassword: '', nuovaPassword: '' });
+
+            setFeedback({ tipo: 'success', testo: "Password aggiornata con successo!" });
+
         } catch (err) {
-            console.error("Errore nell'invio:", err);
+            console.error("Errore durante il cambio password:", err);
+
+            let erroreTesto = "Errore nell'aggiornamento della password.";
+
+            if (err.name === 'NotAuthorizedException') {
+                erroreTesto = "La vecchia password inserita non è corretta.";
+            } else if (err.name === 'LimitExceededException') {
+                erroreTesto = "Troppi tentativi falliti. Riprova più tardi.";
+            }else if (err.message?.includes("symbol")  ) {
+                erroreTesto = "La nuova password deve contenere almeno un carattere speciale";
+            } else if (err.message) {
+                erroreTesto = err.message;
+            }
+
+            setFeedback({ tipo: 'error', testo: erroreTesto });
         } finally {
             setLoading(false);
         }
     };
+
 
     return ( 
         <div style={formCardStyle}>
@@ -95,6 +115,20 @@ const ChangePasswordForm = ({ onUpdate, styles }) => {
                 >
                     {loading ? 'Aggiornamento...' : 'Aggiorna Password'}
                 </button>
+                {feedback && (
+                    <div style={{
+                        marginTop: "15px",
+                        padding: "10px",
+                        borderRadius: "6px",
+                        backgroundColor: feedback.tipo === 'error' ? '#FEE2E2' : '#DCFCE7',
+                        color: feedback.tipo === 'error' ? '#B91C1C' : '#166534',
+                        fontWeight: '600',
+                        textAlign: 'center'
+                    }}>
+                        {feedback.testo}
+                    </div>
+                )}
+
             </form>
         </div>
     );

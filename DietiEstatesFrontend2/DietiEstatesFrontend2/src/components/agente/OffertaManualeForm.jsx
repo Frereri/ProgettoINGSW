@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { fetchAuthSession } from 'aws-amplify/auth';
+import Toast from '../Toast/Toast';
+import { useToast } from '../Toast/useToast';
 
-const OffertaManualeForm = ({ styles }) => {
+const OffertaManualeForm = ({ styles, onSave }) => {
     const [immobili, setImmobili] = useState([]);
     const [loading, setLoading] = useState(false);
+    const { toastProps, showToast } = useToast();
     const [formData, setFormData] = useState({
         idImmobile: '', 
         nomeCognomeCliente: '',
@@ -54,17 +57,20 @@ const OffertaManualeForm = ({ styles }) => {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            alert("Offerta registrata con successo!");
+            showToast("Offerta registrata con successo!","success");
             setFormData({ idImmobile: '', nomeCognomeCliente: '', prezzoOfferto: '' });
+
+            setTimeout(() => onSave?.(), 2500);
         } catch (err) {
             console.error("Errore durante l'invio:", err.response?.data);
-            alert("Errore nel salvataggio. Verifica la connessione o la coerenza dei dati.");
+            showToast("Errore nel salvataggio. Verifica la connessione o la coerenza dei dati.","error");
         } finally {
             setLoading(false);
         }
     };
 
     return (
+        <>
         <div style={styles.formCardStyle}>
             <div style={{ textAlign: 'center', marginBottom: '20px', fontSize: '2rem' }}>⌨️</div>
             <h3 style={formTitleStyle}>Registrazione Manuale</h3>
@@ -108,6 +114,7 @@ const OffertaManualeForm = ({ styles }) => {
                         style={styles.inputStyle} 
                         type="number" 
                         placeholder="Inserisci l'importo" 
+                        min={0}
                         value={formData.prezzoOfferto}
                         onChange={e => setFormData({...formData, prezzoOfferto: e.target.value})}
                         required
@@ -127,6 +134,8 @@ const OffertaManualeForm = ({ styles }) => {
                 </button>
             </form>
         </div>
+        <Toast {...toastProps} />
+        </>
     );
 };
 
