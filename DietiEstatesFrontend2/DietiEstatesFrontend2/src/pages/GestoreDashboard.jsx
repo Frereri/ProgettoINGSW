@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { updatePassword } from 'aws-amplify/auth';
 
 import Logo from '../components/Logo';
 import ChangePasswordForm from '../components/ChangePasswordForm';
@@ -34,6 +35,30 @@ const GestoreDashboard = () => {
     const handleEliminaAgente = (id) => {
         setSelectedAgenteId(id);
         setView('confermaElimina');
+    };
+
+    const handlePasswordUpdate = async (pwData) => {
+        try {
+            await updatePassword({
+                oldPassword: pwData.vecchiaPassword,
+                newPassword: pwData.nuovaPassword
+            });
+
+            alert("Password aggiornata con successo!");
+            setView('menu');
+        } catch (err) {
+            console.error("Errore durante il cambio password:", err);
+            
+            if (err.name === 'NotAuthorizedException') {
+                alert("La vecchia password non è corretta.");
+            } else if (err.name === 'LimitExceededException') {
+                alert("Troppi tentativi. Riprova più tardi.");
+            } else {
+                alert("Errore: " + err.message);
+            }
+            
+            throw err;
+        }
     };
 
     const menuCards = [
@@ -76,7 +101,7 @@ const GestoreDashboard = () => {
             case 'password':
                 return (
                     <div style={formWrapperStyle}>
-                        <ChangePasswordForm styles={dashboardStyles} />
+                        <ChangePasswordForm styles={dashboardStyles} onUpdate={handlePasswordUpdate} />
                     </div>
                 );
 

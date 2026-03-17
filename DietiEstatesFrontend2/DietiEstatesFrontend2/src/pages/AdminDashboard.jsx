@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signOut, fetchAuthSession } from 'aws-amplify/auth';
+import { signOut, fetchAuthSession, updatePassword } from 'aws-amplify/auth';
 import axios from 'axios';
 
 import Logo from '../components/Logo';
@@ -149,6 +149,28 @@ const AdminDashboard = () => {
 
     if (loading) return <div style={loadingContainerStyle}>Caricamento in corso...</div>;
 
+    const handlePasswordUpdate = async (pwData) => {
+        try {
+            await updatePassword({
+                oldPassword: pwData.vecchiaPassword,
+                newPassword: pwData.nuovaPassword
+            });
+
+            alert("Password aggiornata con successo!");
+            setView('overview');
+        } catch (err) {
+            console.error("Errore durante il cambio password:", err);
+
+            if (err.name === 'NotAuthorizedException') {
+                alert("La vecchia password inserita non è corretta.");
+            } else {
+                alert("Errore nell'aggiornamento: " + err.message);
+            }
+
+            throw err; 
+        }
+    };
+
     return (
         <div style={adminContainerStyle}>
             {/* SIDEBAR NAV */}
@@ -260,7 +282,7 @@ const AdminDashboard = () => {
 
                     {view === 'changePassword' && (
                         <div style={centerFormWrapper}>
-                            <ChangePasswordForm styles={dashboardFormStyles} onUpdate={(data) => setView('overview')} />
+                            <ChangePasswordForm styles={dashboardFormStyles} onUpdate={handlePasswordUpdate} />
                         </div>
                     )}
 

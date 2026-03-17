@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Logo from '../components/Logo';
 import { useNavigate } from 'react-router-dom';
-import { signOut, fetchAuthSession } from 'aws-amplify/auth';
+import { signOut, fetchAuthSession, updatePassword } from 'aws-amplify/auth';
 
 import ImmobileForm from '../components/ImmobileForm';
 import ChangePasswordForm from '../components/ChangePasswordForm';
@@ -39,6 +39,30 @@ const AgenteDashboard = () => {
             window.location.reload();
         } catch (error) { 
             console.error("Errore durante il logout:", error); 
+        }
+    };
+    
+    const handlePasswordUpdate = async (pwData) => {
+        try {
+            await updatePassword({
+                oldPassword: pwData.vecchiaPassword,
+                newPassword: pwData.nuovaPassword
+            });
+
+            alert("Password aggiornata con successo!");
+            setView('menu');
+        } catch (err) {
+            console.error("Errore cambio password:", err);
+            
+            if (err.name === 'NotAuthorizedException') {
+                alert("La vecchia password non è corretta.");
+            } else if (err.name === 'LimitExceededException') {
+                alert("Troppi tentativi falliti. Riprova più tardi.");
+            } else {
+                alert("Errore: " + err.message);
+            }
+            
+            throw err; 
         }
     };
 
@@ -111,7 +135,7 @@ const AgenteDashboard = () => {
 
                     {/* Altre viste */}
                     {view === 'offertaManuale' && <OffertaManualeForm styles={dashboardFormStyles} />}
-                    {view === 'password' && <ChangePasswordForm styles={dashboardFormStyles} />}
+                    {view === 'password' && <ChangePasswordForm styles={dashboardFormStyles} onUpdate={handlePasswordUpdate} />}
                     {view === 'gestioneOfferte' && <OfferteTabellaAgente modo="gestione" onSeeLog={(id) => { setSelectedOffertaId(id); setView('dettaglioLog'); }} />}
                     {view === 'storico' && <OfferteTabellaAgente modo="storico" onSeeLog={(id) => { setSelectedOffertaId(id); setView('dettaglioLog'); }} />}
                     {view === 'dettaglioLog' && <StoricoOffertaDettaglio idOfferta={selectedOffertaId} />}
