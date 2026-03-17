@@ -2,7 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { fetchAuthSession } from 'aws-amplify/auth';
-import { PropertyForm } from '../components/dashboard/PropertyForm';
+import { PropertyForm } from '../PropertyForm';
 
 const NuovoImmobilePage = () => {
     const navigate = useNavigate();
