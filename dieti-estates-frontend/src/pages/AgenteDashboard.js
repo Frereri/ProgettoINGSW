@@ -9,9 +9,11 @@ import OfferteTabellaAgente from '../components/agenteDashboard/OfferteTabellaAg
 import StoricoOffertaDettaglio from '../components/agenteDashboard/StoricoOffertaDettaglio';
 import ImmobiliLista from '../components/ImmobiliLista';
 import OffertaManualeForm from '../components/agenteDashboard/OffertaManualeForm';
+import Toast, {useToast } from '../components/Toast';
 
 const AgenteDashboard = () => {
     const navigate = useNavigate();
+    const { toastProps, showToast } = useToast();
     const [view, setView] = useState('menu');
     const [selectedOffertaId, setSelectedOffertaId] = useState(null);
     
@@ -43,8 +45,8 @@ const AgenteDashboard = () => {
     };
 
     const handleSaveProperty = () => {
-        alert("Operazione completata con successo!");
         setView('menu'); // Torna al menu principale
+        showToast("Immobile salvato correttamente!", "success", 3000);;
         // Qui potresti aggiungere una logica per rinfrescare ImmobiliLista se necessario
     };
 
@@ -96,7 +98,9 @@ const AgenteDashboard = () => {
                 )}
 
                 {view === 'nuovoImmobile' && (
-                    <PropertyForm onSave={handleSaveProperty} styles={dashboardFormStyles} />
+                    <PropertyForm onSave={handleSaveProperty} 
+                    showToast={showToast}
+                    styles={dashboardFormStyles} />
                 )}
 
                 {view === 'password' && (
@@ -118,6 +122,8 @@ const AgenteDashboard = () => {
                     <StoricoOffertaDettaglio idOfferta={selectedOffertaId} />
                 )}
             </main>
+
+                <Toast {...toastProps} />
 
             <footer style={footerStyle}>
                 <p>assistenza@dietiestates.it | +39 3927309033</p>

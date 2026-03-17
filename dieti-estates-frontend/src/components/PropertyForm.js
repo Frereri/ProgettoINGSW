@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { fetchAuthSession } from 'aws-amplify/auth';
+import Toast, { useToast } from './Toast';
 
-export const PropertyForm = ({ initialData, onSubmit, styles, onSave, agentiProps = [], isGestore = false }) => {    
+export const PropertyForm = ({ initialData, onSubmit, styles, onSave, agentiProps = [], isGestore = false }) => {
+    const { toastProps, showToast } = useToast();
+
     const [agenti, setAgenti] = useState([]);
     const [formData, setFormData] = useState({
         idAgente: initialData?.agente?.idUtente,
         titolo: '', citta: '', provincia: '', indirizzo: '', prezzo: 0,
-        descrizione: '', numeroStanze: 0, classeEnergetica: '', tipoImmobile: '',
-        tipoContratto: 'VENDITA', tipoAffitto: '', superficie: 0, stato: 'DISPONIBILE',
-        numeroLetti: 0, numeroBagni: 0, piano: 0,
+        descrizione: '', numeroStanze: 1, classeEnergetica: '', tipoImmobile: '',
+        tipoContratto: 'VENDITA', tipoAffitto: '', superficie: 28, stato: 'DISPONIBILE',
+        numeroLetti: 1, numeroBagni: 1, piano: 0,
         climatizzazione: false, boxAuto: false, terrazzo: false, ascensore: false,
         portineria: false, giardino: false, piscina: false, superficieGiardino: 0,
         vicinoScuole: false, vicinoParchi: false, vicinoTrasporti: false,
-        ...initialData // I dati del DB sovrascriveranno questi, ma solo se presenti
+        ...initialData
     });
 
     const [anteprimeEsistenti, setAnteprimeEsistenti] = useState(initialData?.immagini || []);
@@ -181,12 +184,10 @@ export const PropertyForm = ({ initialData, onSubmit, styles, onSave, agentiProp
                 }
             });
 
-            alert("Salvataggio completato!");
-            if (onSave) onSave();
-
+        if (onSave) onSave();
         } catch (err) {
             console.error("Dettaglio Errore:", err.response?.data);
-            alert("Errore: " + (err.response?.data?.message || "Controlla i log di Eclipse"));
+            showToast("Errore: " + (err.response?.data?.message || "Controlla i log di Eclipse"),"error");
         }
     };
 
@@ -214,7 +215,8 @@ export const PropertyForm = ({ initialData, onSubmit, styles, onSave, agentiProp
             <div style={{ display: 'flex', gap: '20px', marginBottom: '15px' }}>
                 <div style={{ flex: 2 }}>
                     <label style={labelStyle}>Indirizzo (Via/Piazza e Civico)</label>
-                    <input name="indirizzo" style={styles.inputStyle} placeholder="Via Roma 10" value={formData.indirizzo} onChange={handleChange} required />
+                    <input name="indirizzo" 
+                    style={styles.inputStyle} placeholder="Via Roma 10" value={formData.indirizzo} onChange={handleChange} required />
                 </div>
                 <div style={{ flex: 1 }}>
                     <label style={labelStyle}>Città</label>
@@ -253,15 +255,26 @@ export const PropertyForm = ({ initialData, onSubmit, styles, onSave, agentiProp
                     {/* GRUPPO 1 */}
                     <div>
                         <label style={labelStyle}>📐 Superficie (mq)</label>
-                        <input name="superficie" type="number" value={formData.superficie} onChange={handleChange} style={styles.inputStyle} required />
+                        <input 
+                            name="superficie" 
+                            type="number" 
+                            min={28}
+                            value={formData.superficie} 
+                            onChange={handleChange} 
+                            style={styles.inputStyle} 
+                            required/>
                     </div>
                     <div>
                         <label style={labelStyle}>🚪 Stanze</label>
-                        <input name="numeroStanze" type="number" value={formData.numeroStanze} onChange={handleChange} style={styles.inputStyle} />
+                        <input name="numeroStanze" 
+                            type="number"
+                            min={1}
+                            value={formData.numeroStanze} onChange={handleChange} style={styles.inputStyle} 
+                            required/>
                     </div>
                     <div>
                         <label style={labelStyle}>⚡ Classe Energetica</label>
-                        <select name="classeEnergetica" value={formData.classeEnergetica || ''} onChange={handleChange} style={styles.inputStyle}>
+                        <select name="classeEnergetica" value={formData.classeEnergetica || ''} onChange={handleChange} style={styles.inputStyle} required>
                             <option value="">Seleziona...</option>
                             <option value="A4">A4</option>
                             <option value="A">A</option>
@@ -272,11 +285,11 @@ export const PropertyForm = ({ initialData, onSubmit, styles, onSave, agentiProp
                     {/* GRUPPO 2 */}
                     <div>
                         <label style={labelStyle}>🛌 Letti</label>
-                        <input name="numeroLetti" type="number" value={formData.numeroLetti || ''} onChange={handleChange} style={styles.inputStyle} />
+                        <input name="numeroLetti" type="number" min={1} value={formData.numeroLetti || ''} onChange={handleChange} style={styles.inputStyle} required/>
                     </div>
                     <div>
                         <label style={labelStyle}>🚿 Bagni</label>
-                        <input name="numeroBagni" type="number" value={formData.numeroBagni || ''} onChange={handleChange} style={styles.inputStyle} />
+                        <input name="numeroBagni" type="number" min={1} value={formData.numeroBagni || ''} onChange={handleChange} style={styles.inputStyle} />
                     </div>
                     <div>
                         <label style={labelStyle}>📌 Stato</label>
@@ -449,6 +462,8 @@ export const PropertyForm = ({ initialData, onSubmit, styles, onSave, agentiProp
                     </label>
                 </div>
             </div>
+
+            <Toast {...toastProps} />
 
             <button type="submit" style={{ ...styles.submitButtonStyle, marginTop: '25px', width: '100%' }}>
                 {formData.idImmobile ? '💾 Salva Modifiche' : '🚀 Pubblica Annuncio'}
