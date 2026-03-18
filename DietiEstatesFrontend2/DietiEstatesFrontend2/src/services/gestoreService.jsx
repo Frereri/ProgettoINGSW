@@ -23,9 +23,17 @@ const apiRequest = async (endpoint, options = {}) => {
         });
 
         if (response.status === 204) return true;
+        if (response.status === 200) {
+            const text = await response.text();
+            return text ? JSON.parse(text) : true;
+        }
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
+            if (response.status === 409) 
+                throw new Error("Email già in uso.");
+            if (response.status === 500) 
+                throw new Error("Errore del server. Riprova più tardi.");
             throw new Error(errorData.message || `Errore API: ${response.status}`);
         }
 

@@ -145,9 +145,9 @@ package "DTO" #LightCyan {
   UtenteDTO <|-- AmministratoreDTO
   UtenteDTO <|-- SupportoAmministratoreDTO
 
-  ' Composizione
-  RegistrazioneClienteDTO *-- ClienteDTO
-  CreazioneStaffDTO *-- UtenteDTO
+  ' Assocazioni
+  RegistrazioneClienteDTO -- ClienteDTO
+  CreazioneStaffDTO -- UtenteDTO
 }
 
 @enduml

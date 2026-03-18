@@ -190,7 +190,7 @@ const DettagliImmobile = () => {
                             <div style={offerSection}>
                                 <h3 style={{ margin: '0 0 15px 0' }}>Fai un'offerta</h3>
                                 <form onSubmit={gestisciInvioOfferta} style={offerForm}>
-                                    <input type="number" placeholder="Importo €" value={offerta} onChange={(e) => setOfferta(e.target.value)} style={offerInput} />
+                                    <input type="number" placeholder="Importo €" min={1} value={offerta} onChange={(e) => setOfferta(e.target.value)} style={offerInput} />
                                     <button type="submit" style={offerSubmitBtn}>Invia</button>
                                 </form>
                                 {messaggioOfferta.testo && <div style={msgFeedback}>{messaggioOfferta.testo}</div>}

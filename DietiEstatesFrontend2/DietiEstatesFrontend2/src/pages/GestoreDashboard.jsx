@@ -9,14 +9,22 @@ import NuovoAgenteForm from '../components/gestore/NuovoAgenteForm';
 import ListaImmobili from '../components/ListaImmobili';
 import ImmobileForm from '../components/ImmobileForm';
 import { useAuth } from '../context/useAuth';
+import Toast from '../components/Toast/Toast';
+import { useToast } from '../components/Toast/useToast';
+import ConfirmModal from '../components/ConfirmModal';
+import { eliminaAgente, aggiornaAgente } from '../services/gestoreService';
+
 
 const GestoreDashboard = () => {
     const navigate = useNavigate();
     const { logout } = useAuth();
     const [view, setView] = useState('menu');
     
-    const [selectedAgente, setSelectedAgente] = useState(null);
-    const [selectedAgenteId, setSelectedAgenteId] = useState(null);
+    const [editingAgente, setEditingAgente] = useState(null);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [confirmMessage, setConfirmMessage] = useState('');
+    const [onConfirmAction, setOnConfirmAction] = useState(() => {});
+    const { toastProps, showToast } = useToast();
 
     const handleLogout = async () => {
         try {
@@ -28,14 +36,40 @@ const GestoreDashboard = () => {
     };
 
     const handleEditAgente = (agente) => {
-        setSelectedAgente(agente);
-        setView('modificaAgente');
+        setEditingAgente(agente);
     };
 
-    const handleEliminaAgente = (id) => {
-        setSelectedAgenteId(id);
-        setView('confermaElimina');
+    const handleSaveAgente = async (e) => {
+        e.preventDefault();
+        try {
+            await aggiornaAgente(editingAgente.idUtente, {
+                nome: editingAgente.nome,
+                cognome: editingAgente.cognome,
+                ruolo: editingAgente.ruolo
+            });
+            showToast("Agente aggiornato!", "success", 2500);
+            setEditingAgente(null);
+        } catch (err) {
+            showToast("Errore durante la modifica.", "warning",2500);
+        }
     };
+
+    const handleEliminaAgente = (idUtente) => {
+        setConfirmMessage(`Sei sicuro di voler eliminare questo agente?`);
+        setOnConfirmAction(() => async () => {
+            try {
+                await eliminaAgente(idUtente);
+                showToast("Agente eliminato.", "success", 2500);
+                setTimeout(() => setView('menu'), 500);
+            } catch (err) {
+                showToast("Errore durante l'eliminazione.", "error");
+            } finally {
+                setConfirmOpen(false);
+            }
+        });
+        setConfirmOpen(true);
+    };
+
 
 
     const handlePasswordUpdate = async (pwData) => {
@@ -62,14 +96,44 @@ const GestoreDashboard = () => {
     const renderView = () => {
         switch (view) {
             case 'nuovoAgente':
-                return <NuovoAgenteForm onSave={() => setView('listaAgenti')} styles={dashboardStyles} />;
+                return <NuovoAgenteForm onSave={() =>{ showToast("Agente creato con successo!", "success", 2500);
+                     setView('listaAgenti')}} styles={dashboardStyles} />;
             
             case 'listaAgenti':
-                return <ListaAgenti 
-                    styles={dashboardStyles}
-                    onEdit={handleEditAgente} 
-                    onElimina={handleEliminaAgente}
-                />;
+                return (
+                    <>
+                        {editingAgente && (
+                            <div style={editPopupStyle}>
+                                <h4 style={{ margin: '0 0 12px 0', color: '#0F172A' }}>
+                                    ✏️ Modifica: {editingAgente.email}
+                                </h4>
+                                <form onSubmit={handleSaveAgente} style={horizontalFormStyle}>
+                                    <input
+                                        style={dashboardStyles.inputStyle}
+                                        value={editingAgente.nome}
+                                        onChange={e => setEditingAgente({ ...editingAgente, nome: e.target.value })}
+                                        placeholder="Nome"
+                                        required
+                                    />
+                                    <input
+                                        style={dashboardStyles.inputStyle}
+                                        value={editingAgente.cognome}
+                                        onChange={e => setEditingAgente({ ...editingAgente, cognome: e.target.value })}
+                                        placeholder="Cognome"
+                                        required
+                                    />
+                                    <button type="submit" style={dashboardStyles.submitButtonStyle}>Salva</button>
+                                    <button type="button" onClick={() => setEditingAgente(null)} style={cancelButtonStyle}>Annulla</button>
+                                </form>
+                            </div>
+                        )}
+                        <ListaAgenti
+                            styles={dashboardStyles}
+                            onEdit={handleEditAgente}
+                            onElimina={handleEliminaAgente}
+                        />
+                    </>
+                );
             
             case 'immobiliAgenzia':
                 return (
@@ -142,11 +206,20 @@ const GestoreDashboard = () => {
                 <div style={viewContainerStyle}>
                     {renderView()}
                 </div>
+
+
             </main>
 
             <footer style={footerStyle}>
                 <p>© 2024 DietiEstates Professional • Supporto: <a href="mailto:assistenza@dietiestates.it" style={{color: '#3498DB'}}>assistenza@dietiestates.it</a></p>
             </footer>
+            <ConfirmModal
+                open={confirmOpen}
+                message={confirmMessage}
+                onConfirm={onConfirmAction}
+                onCancel={() => setConfirmOpen(false)}
+            />
+            <Toast {...toastProps} />
         </div>
     );
 };
@@ -285,5 +358,8 @@ const backButtonStyle = {
 const formWrapperStyle = { maxWidth: '600px', margin: '0 auto' };
 
 const footerStyle = { padding: '20px', textAlign: 'center', fontSize: '0.8rem', color: '#94A3B8', borderTop: '1px solid #E2E8F0' };
+const editPopupStyle = { backgroundColor: '#FFFBEB', border: '1px solid #FDE68A', padding: '20px', borderRadius: '12px', marginBottom: '20px' };
+const horizontalFormStyle = { display: 'flex', gap: '15px', alignItems: 'center' };
+const cancelButtonStyle = { backgroundColor: '#94A3B8', color: 'white', border: 'none', padding: '12px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', whiteSpace: 'nowrap' };
 
 export default GestoreDashboard;

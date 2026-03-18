@@ -16,16 +16,20 @@ package "services" #LightPink {
     + signUp(email, password) : String
     + registraCliente(dto) : void
     + adminCreateUser(email) : String
-    + addUserToGroup(email, group) : void
-    + setUserPasswordPermanent(email, pwd) : void
+    + addUserToGroup(email, groupName) : void
+    + setUserPasswordPermanent(email, password) : void
     + confirmUser(email) : void
     + updatePassword(token, old, new) : void
+    + calculateSecretHash( clientId, clientSecret, userName) : String
+    + deleteUser(email) : void
   }
 
   class UtenteService {
     + findAll() : List<UtenteDTO>
     + findById(id) : UtenteDTO
+    + existsByEmail(email) : boolean
     + delete(id) : void
+    + save(dto) :  UtenteDTO
     + registraCliente(dto) : UtenteDTO
     + creaStaff(dto) : UtenteDTO
   }
@@ -44,23 +48,28 @@ package "services" #LightPink {
 
   class GestoreService {
     + creaAgente(idGestore, dto) : AgenteDTO
+    + getAgentiAgenzia(idGestore) : List<AgenteDTO>
+    + getImmobiliAgenzia(idGestore) : List<ImmobileDTO>
+    + aggiornaAgente(idAgente, dto) : AgenteDTO 
+    + eliminaAgente(idAgente) : void
   }
 
   class AgenteService {
     + getProfiloAgente(id) : AgenteDTO
     + caricaImmobile(dto, idAgente) : ImmobileDTO
-    + aggiornaImmobile(id, dto) : ImmobileDTO
+    + checkServiziZona(immobile): void
+    + aggiornaImmobile(idImmobile, dto) : ImmobileDTO
     + inserisciOffertaEsterna(dto, idImmobile) : OffertaDTO
-    + gestisciOfferta(id, stato, prezzo, nota, idAgente) : OffertaDTO
-    + getOffertePerAgente(id) : List<OffertaDTO>
-    + getOfferteAttivePerAgente(id) : List<OffertaDTO>
-    + getStoricoOfferta(id, idAgente) : List<StoricoOffertaDTO>
+    + gestisciOfferta(idOfferta, stato, prezzo, nota, idAgente) : OffertaDTO
+    + getOffertePerAgente(idAgente) : List<OffertaDTO>
+    + getOfferteAttivePerAgente(idAgente) : List<OffertaDTO>
+    + getStoricoOfferta(idOfferta, idAgente) : List<StoricoOffertaDTO>
   }
 
   class ClienteService {
     + inviaOfferta(dto, idCliente) : OffertaDTO
-    + aggiornaStatoOfferta(id, idCliente, stato) : OffertaDTO
-    + getOffertePerCliente(id) : List<OffertaDTO>
+    + aggiornaStatoOfferta(idOfferta, idCliente, stato) : OffertaDTO
+    + getOffertePerCliente(uuidUtente) : List<OffertaDTO>
   }
 
   class ImmobileService {
@@ -68,21 +77,23 @@ package "services" #LightPink {
     + getImmobileById(id) : ImmobileDTO
     + searchImmobili(citta, min, max, contratto) : List<ImmobileDTO>
     + saveImmobileFromDTO(dto) : ImmobileDTO
-    + deleteImmobile(id) : void
+    + updateImmobile(id,dto) : ImmobileDTO
+    + deleteImmobile(idAgente) : void
+    + getImmobiliByAgenteAgenzia(idAgente) : List<ImmobileDTO>
   }
 
   class OffertaService {
     + createOfferta(dto) : OffertaDTO
     + aggiornaStato(id, stato, controfferta) : OffertaDTO
     + findAll() : List<OffertaDTO>
-    + findByCliente(id) : List<OffertaDTO>
-    + getOffertePerImmobile(id) : List<OffertaDTO>
-    + getOffertePerAgente(id) : List<OffertaDTO>
+    + findByCliente(idCliente) : List<OffertaDTO>
+    + getOffertePerImmobile(idImmobile) : List<OffertaDTO>
+    + getOffertePerAgente(idAgente) : List<OffertaDTO>
   }
 
   class ImmagineService {
-    + aggiungiImmagine(id, url, copertina) : ImmobileImmagineDTO
-    + eliminaImmagine(id) : void
+    + aggiungiImmagine(idImmobile, url, copertina) : ImmobileImmagineDTO
+    + eliminaImmagine(idImmagine) : void
   }
 
   class GeoService {
@@ -109,8 +120,9 @@ package "controllers" #Lavender {
   class UtenteController {
     GET    /api/utente
     GET    /api/utente/{id}
-    DELETE /api/utente/{id}
+    POST    /api/utente
     POST   /api/utente/update-password
+    DELETE /api/utente/{id}
   }
 
   class AgenziaController {
@@ -118,6 +130,7 @@ package "controllers" #Lavender {
     GET    /api/agenzia/{id}
     POST   /api/agenzia
     DELETE /api/agenzia/{id}
+    PUT    /api/agenzia/{id}
   }
 
   class AmministratoreController {
@@ -127,21 +140,27 @@ package "controllers" #Lavender {
 
   class GestoreController {
     POST /api/gestore/registra-agente
+    GET /api/gestore/miei-agenti
+    GET /api/gestore/immobili-agenzia
+    DELETE /api/gestore/agente/{id}
+    PATCH /api/gestore/agente/{id}
+
+
   }
 
   class AgenteController {
     GET   /api/agente/profilo
-    GET   /api/agente/offerte/tutte
+    GET   /api/agente/offerte-ricevute
     GET   /api/agente/offerte/attive
     POST  /api/agente/immobili
     PUT   /api/agente/aggiorna-immobile/{id}
-    POST  /api/agente/immobili/{id}/offerta-esterna
-    PATCH /api/agente/offerte/{id}
+    POST  /api/agente/immobili/{idImmobile}/offerta-esterna
+    PATCH /api/agente/offerte/{idOfferta}
   }
 
   class ClienteController {
     POST  /api/cliente/offerte/crea
-    PATCH /api/cliente/offerte/{id}/rispondi
+    PATCH /api/cliente/offerte/{idOfferta}/rispondi
     GET   /api/cliente/mie-offerte
   }
 
@@ -149,21 +168,23 @@ package "controllers" #Lavender {
     GET    /api/immobile
     GET    /api/immobile/cerca
     GET    /api/immobile/{id}
+    GET    /api/immobile/mio-organiico/{idAgente}
     POST   /api/immobile
+    PUT    /api/immobile/{id}
     DELETE /api/immobile/{id}
   }
 
   class OffertaController {
     GET   /api/offerta
     GET   /api/offerta/immobile/{id}
-    GET   /api/offerta/cliente/{id}
+    GET   /api/offerta/cliente/{idCliente}
     POST  /api/offerta
     PATCH /api/offerta/{id}/stato
   }
 
   class ImmagineController {
-    POST   /api/immobile/immagine/{id}
-    DELETE /api/immobile/immagine/{id}
+    POST   /api/immobile/immagine/{idImmagine}
+    DELETE /api/immobile/immagine/{idImmagine}
   }
 
   ' Controller -> Service
