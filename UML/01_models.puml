@@ -121,13 +121,15 @@ package "models" #LightYellow {
   Immobile <|-- Villa
 
   ' Relazioni
-  Agenzia "1" o-- "0..*" Agente
-  Agenzia "1" o-- "0..*" Immobile
-  Agente "1" o-- "0..*" Immobile
-  Immobile "1" o-- "0..*" Offerta
-  Immobile "1" o-- "0..*" ImmobileImmagine
-  Cliente "1" o-- "0..*" Offerta
-  Offerta "1" o-- "0..*" StoricoOfferta
+  Agenzia "1" -- "0..*" Agente
+  Agenzia "1" -- "0..*" Immobile
+  Agente "1" -- "0..*" Immobile
+  Immobile "1" -- "0..*" Offerta
+  Immobile "1" -- "0..*" ImmobileImmagine
+  Cliente "1" -- "0..*" Offerta
+  Offerta "1" -- "0..*" StoricoOfferta
+  Agenzia "1" -- "1..*" Gestore
+  Agenzia  "1" -- "0..*" Immobile
 }
 
 @enduml

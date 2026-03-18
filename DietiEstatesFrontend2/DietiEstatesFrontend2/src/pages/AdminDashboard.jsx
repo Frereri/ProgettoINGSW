@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signOut, fetchAuthSession } from 'aws-amplify/auth';
+import { signOut, fetchAuthSession,updatePassword } from 'aws-amplify/auth';
+import ConfirmModal from '../components/ConfirmModal';
+import Toast from '../components/Toast/Toast';
+import { useToast } from '../components/Toast/useToast';
+
 import axios from 'axios';
 
 import Logo from '../components/Logo';
@@ -21,6 +25,10 @@ const AdminDashboard = () => {
     const [formData, setFormData] = useState({
         email: '', nome: '', cognome: '', idAgenzia: '', password: ''
     });
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [confirmMessage, setConfirmMessage] = useState("");
+    const [onConfirmAction, setOnConfirmAction] = useState(() => {});
+    const { toastProps, showToast } = useToast();
 
     const [editingAgenzia, setEditingAgenzia] = useState(null);
     const [editingUtente, setEditingUtente] = useState(null);
@@ -66,19 +74,30 @@ const AdminDashboard = () => {
             if (isEdit) await axios.put(url, editingAgenzia);
             else await axios.post(url, editingAgenzia);
             
-            alert(isEdit ? "Agenzia aggiornata!" : "Agenzia creata!");
+            showToast(isEdit ? "Agenzia aggiornata!" : "Agenzia creata!", "success", 2500);
             setEditingAgenzia(null);
             fetchData();
-        } catch (err) { alert("Errore nel salvataggio agenzia"); }
+        } catch (err) {
+            showToast("Errore nel salvataggio agenzia","warning"); }
     };
 
-    const handleDeleteAgenzia = async (id) => {
-        if (!window.confirm("Eliminando l'agenzia eliminerai i vincoli con i gestori. Procedere?")) return;
-        try {
-            await axios.delete(`http://localhost:8080/api/agenzia/${id}`);
-            fetchData();
-        } catch (err) { alert("Errore: controlla se ci sono gestori legati a questa agenzia"); }
+    const handleDeleteAgenzia = (id) => {
+        setConfirmMessage("Eliminando l'agenzia eliminerai i vincoli con i gestori. Procedere?");
+        setOnConfirmAction(() => async () => {
+            try {
+                await axios.delete(`http://localhost:8080/api/agenzia/${id}`);
+
+                showToast("Agenzia Eliminata","success");
+                fetchData();
+            } catch (err) {
+                showToast("Errore: controlla se ci sono gestori legati a questa agenzia","warning");
+            } finally {
+                setConfirmOpen(false);
+            }
+        });
+        setConfirmOpen(true);
     };
+
 
     const handleUpdateUtente = async (e) => {
         e.preventDefault();
@@ -88,25 +107,43 @@ const AdminDashboard = () => {
             await axios.post(`http://localhost:8080/api/utente`, editingUtente, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            alert("Utente aggiornato!");
+            showToast("Utente aggiornato!","success");
             setEditingUtente(null);
             fetchData();
-        } catch (err) { alert("Errore aggiornamento utente"); }
+        } catch (err) { 
+            showToast("Errore aggiornamento utente, riprova","warning"); }
     };
 
-    const handleDeleteUtente = async (user) => {
+    const handleDeleteUtente = (user) => {
         const userId = user.idUtente || user.id;
-        if (!window.confirm(`Sei sicuro di voler eliminare l'utente?`)) return;
-        try {
-            const session = await fetchAuthSession();
-            const token = session.tokens?.accessToken?.toString();
-            await axios.delete(`http://localhost:8080/api/utente/${userId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            alert("Utente eliminato");
-            fetchData();
-        } catch (err) { alert("Errore durante l'eliminazione"); }
+
+        setConfirmMessage("Sei sicuro di voler eliminare l'utente?");
+        setOnConfirmAction(() => async () => {
+            try {
+                const session = await fetchAuthSession();
+                const token = session.tokens?.accessToken?.toString();
+
+                await axios.delete(`http://localhost:8080/api/utente/${userId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                showToast("Utente eliminato","success",2500);
+                fetchData();
+            } catch (err) {
+                showToast("Errore durante l'eliminazione","error");
+            } finally {
+                setConfirmOpen(false);
+            }
+        });
+
+        setConfirmOpen(true);
     };
+
+    const cancelDelete = () => {
+        setConfirmOpen(false);
+        setOnConfirmAction(() => {});
+    };
+
 
     const handleSubmitStaff = async (e, type) => {
         e.preventDefault();
@@ -126,18 +163,18 @@ const AdminDashboard = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
-            alert(`${type.toUpperCase()} creato con successo!`);
+            showToast(`${type.toUpperCase()} creato con successo!`,"success");
             setFormData({ email: '', nome: '', cognome: '', idAgenzia: '', password: '' });
             setView('overview');
             fetchData();
         } catch (err) {
-            const errorMessage = err.response?.data;
-            if (errorMessage && errorMessage.includes("UsernameExistsException")) {
-                alert("Errore: Un utente con questa email è già registrato.");
+            if (err.response?.status === 409) {
+                showToast("Email è già esistente.", "warning",2500);
             } else {
-                alert("Errore: " + (errorMessage || err.message));
+                const errorText = err.response?.data?.message || err.message;
+                showToast("Errore: " + errorText, "error");
             }
-        } finally {
+        }finally {
             setIsSubmitting(false);
         }
     };
@@ -153,18 +190,9 @@ const AdminDashboard = () => {
                 oldPassword: pwData.vecchiaPassword,
                 newPassword: pwData.nuovaPassword
             });
-
-            alert("Password aggiornata con successo!");
-            setView('overview');
-        } catch (err) {
-            console.error("Errore durante il cambio password:", err);
-
-            if (err.name === 'NotAuthorizedException') {
-                alert("La vecchia password inserita non è corretta.");
-            } else {
-                alert("Errore nell'aggiornamento: " + err.message);
-            }
-
+            return;
+            } catch (err) {
+                console.error("Errore cambio password:", err);
             throw err; 
         }
     };
@@ -299,6 +327,13 @@ const AdminDashboard = () => {
                         />
                     )}
                 </div>
+                <ConfirmModal
+                    open={confirmOpen}
+                    message={confirmMessage}
+                    onConfirm={onConfirmAction}
+                    onCancel={cancelDelete}
+                />
+            <Toast {...toastProps} />
             </main>
         </div>
     );

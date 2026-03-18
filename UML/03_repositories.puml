@@ -1,5 +1,4 @@
-@startuml DietiEstates2_Repositories
-
+@startuml
 skinparam linetype ortho
 skinparam packageStyle rectangle
 skinparam classAttributeIconSize 0
@@ -15,79 +14,57 @@ package "repositories" #LightGreen {
     + findByEmail(email) : Optional<Utente>
     + existsByEmail(email) : boolean
     + findAllByAgenzia(id) : List<Utente>
-    + findByIdUtente(id) : Optional<Utente>
+    + findByIdUtente(findByIdUtente) : Optional<Utente>
   }
 
   interface AgenteRepo <<JpaRepository<Agente, UUID>>> {
     + findByEmail(email) : Optional<Agente>
-    + findByAgenzia_IdAgenzia(id) : List<Agente>
+    + findByAgenzia_IdAgenzia(idAgenzia) : List<Agente>
   }
 
   interface ClienteRepo <<JpaRepository<Cliente, UUID>>> {
     + findByEmail(email) : Optional<Cliente>
-    + findByIdUtente(id) : Optional<Cliente>
+    + findByIdUtente(idUtente) : Optional<Cliente>
   }
 
   interface GestoreRepo <<JpaRepository<Gestore, UUID>>> {
-    + existsByAgenziaIdAgenzia(id) : boolean
+    + existsByAgenziaIdAgenzia(idAgenzia) : boolean
   }
 
   interface SupportoRepo <<JpaRepository<SupportoAmministratore, UUID>>> {
   }
 
   interface AgenziaRepo <<JpaRepository<Agenzia, Integer>>> {
-    + findByNomeAgenziaIgnoreCase(nome) : Optional<Agenzia>
-    + existsByPartitaIva(piva) : boolean
+    + findByNomeAgenziaIgnoreCase(nomeAgenzia) : Optional<Agenzia>
+    + existsByPartitaIva(partitaIva) : boolean
   }
 
   interface ImmobileRepo <<JpaRepository<Immobile, Integer>>> {
     + findByLocationRange(minLat, maxLat, minLon, maxLon) : List<Immobile>
     + searchImmobiliAvanzata(citta, min, max, contratto) : List<Immobile>
+    + findByAgenziaAgentiIdUtente(idUtente) :List<Immobile>  
+    + findByAgenzia_IdAgenzia(idAgenzia): List<Immobile>
   }
 
   interface ImmobileImmagineRepo <<JpaRepository<ImmobileImmagine, Integer>>> {
-    + findByImmobileIdImmobile(id) : List<ImmobileImmagine>
-    + findByImmobileIdImmobileAndIsCopertinaTrue(id) : List<ImmobileImmagine>
+    + findByImmobileIdImmobile(idImmobile) : List<ImmobileImmagine>
+    + findByImmobileIdImmobileAndIsCopertinaTrue(idImmobile) : List<ImmobileImmagine>
   }
 
   interface OffertaRepo <<JpaRepository<Offerta, Integer>>> {
-    + findByCliente_IdUtente(id) : List<Offerta>
-    + findByImmobile_IdImmobile(id) : List<Offerta>
-    + findByImmobile_Agente_IdUtente(id) : List<Offerta>
-    + findByClienteAndOffertaEsternaFalse(c) : List<Offerta>
-    + findByImmobile_Agente_IdUtenteAndStato(id, stato) : List<Offerta>
-    + findByImmobile_Agente_IdUtenteAndStatoIn(id, stati) : List<Offerta>
+    + findByCliente_IdUtente(idCliente) : List<Offerta>
+    + findByImmobile_IdImmobile(idImmobile) : List<Offerta>
+    + findByImmobile_Agente_IdUtente(idAgente) : List<Offerta>
+    + findByClienteAndOffertaEsternaFalse(cliente) : List<Offerta>
+    + findByCliente(cliente) : List<Offerta>
+    + findByImmobile_Agente_IdUtenteAndStato(idAgente, stato) : List<Offerta>
+    + findByImmobile_Agente_IdUtenteAndStatoIn(idAgente, stati) : List<Offerta>
   }
 
   interface StoricoRepo <<JpaRepository<StoricoOfferta, Integer>>> {
-    + findByOffertaIdOffertaOrderByDataAzioneDesc(id) : List<StoricoOfferta>
+    + findByOffertaIdOffertaOrderByDataAzioneDesc(idOfferta) : List<StoricoOfferta>
     + findByOfferta(offerta) : List<StoricoOfferta>
     + findByOffertaOrderByIdLogDesc(offerta) : List<StoricoOfferta>
   }
 }
-
-package "models (riferimento)" #EEEEEE {
-  class Utente
-  class Agente
-  class Cliente
-  class Gestore
-  class SupportoAmministratore
-  class Agenzia
-  class Immobile
-  class ImmobileImmagine
-  class Offerta
-  class StoricoOfferta
-}
-
-UtenteRepo ..> Utente
-AgenteRepo ..> Agente
-ClienteRepo ..> Cliente
-GestoreRepo ..> Gestore
-SupportoRepo ..> SupportoAmministratore
-AgenziaRepo ..> Agenzia
-ImmobileRepo ..> Immobile
-ImmobileImmagineRepo ..> ImmobileImmagine
-OffertaRepo ..> Offerta
-StoricoRepo ..> StoricoOfferta
-
 @enduml
