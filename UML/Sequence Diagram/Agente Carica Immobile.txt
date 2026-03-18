@@ -1,0 +1,80 @@
+
+@startuml SD_02_Agente_Carica_Immobile
+title  Agente Carica Nuovo Immobile
+
+actor Agente as A
+participant "AgenteDashboard\n(Frontend)" as FE
+participant "AgenteController\n/api/agente" as AC
+participant "AgenteService" as AS
+participant "GeoService" as GEO
+participant "AgenteRepo" as AR
+participant "ImmobileRepo" as IR
+database "Database" as DB
+
+A -> FE : Accede alla dashboard\ne clicca "Carica Immobile"
+activate FE
+
+FE -> FE : Mostra form ImmobileForm
+
+A -> FE : Compila dati immobile\ne conferma
+FE -> AC : POST /api/agente/immobili\n{ImmobileDTO} [JWT Bearer]
+activate AC
+
+AC -> AC : Estrae idAgente dal JWT\n(jwt.getSubject())
+AC -> AS : caricaImmobile(dto, idAgente)
+activate AS
+
+AS -> AR : agenteRepo.findById(idAgente)
+activate AR
+AR -> DB : SELECT Agente
+DB --> AR : Agente
+AR --> AS : Agente
+deactivate AR
+
+AS -> AS : Crea entità Villa o\nAppartamento via mapper
+
+AS -> GEO : getCoordinates(dto.indirizzo)
+activate GEO
+GEO -> GEO : Chiamata HTTP a\nGeoapify Geocoding API
+GEO --> AS : {lat, lon}
+deactivate GEO
+
+alt Coordinate trovate
+    AS -> GEO : isNear(lat, lon, "education.school")
+    activate GEO
+    GEO --> AS : boolean vicinoScuole
+    deactivate GEO
+
+    AS -> GEO : isNear(lat, lon, "leisure.park")
+    activate GEO
+    GEO --> AS : boolean vicinoParchi
+    deactivate GEO
+
+    AS -> GEO : isNear(lat, lon, "public_transport")
+    activate GEO
+    GEO --> AS : boolean vicinoTrasporti
+    deactivate GEO
+
+    AS -> AS : setta agente e agenzia\nsull'immobile
+
+    AS -> IR : immobileRepo.save(immobile)
+    activate IR
+    IR -> DB : INSERT Immobile
+    DB --> IR : Immobile salvato
+    IR --> AS : Immobile
+    deactivate IR
+
+    AS --> AC : ImmobileDTO
+else Coordinate non trovate
+    AS --> AC : 400 Bad Request\n"Indirizzo non valido"
+end
+
+deactivate AS
+
+AC --> FE : 201 Created {ImmobileDTO}
+deactivate AC
+
+FE --> A : Mostra conferma\n"Immobile caricato con successo"
+deactivate FE
+
+@enduml
