@@ -1,0 +1,92 @@
+@startuml SD_05_Gestore_Crea_Agente
+title  Gestore Crea Nuovo Agente
+
+actor Gestore as G
+participant "GestoreDashboard\n(Frontend)" as FE
+participant "NuovoAgenteForm\n(Frontend)" as NAF
+participant "GestoreController\n/api/gestore" as GC
+participant "GestoreService" as GS
+participant "AuthService" as AS
+participant "AWS Cognito" as COG
+participant "AgenteRepo" as AR
+participant "GestoreRepo" as GR
+database "Database" as DB
+
+G -> FE : Accede alla dashboard
+activate FE
+FE --> G : Mostra lista agenti\ne bottone "Nuovo Agente"
+
+G -> NAF : Clicca "Nuovo Agente"
+activate NAF
+NAF --> G : Mostra form\n(nome, cognome, email)
+
+G -> NAF : Compila i dati e conferma
+NAF -> GC : POST /api/gestore/registra-agente\n{AgenteDTO: nome, cognome, email}\n[JWT Bearer]
+activate GC
+
+GC -> GC : Verifica ruolo "Gestori"\n(@PreAuthorize)\nEstrae idGestore dal JWT
+
+GC -> GS : creaAgente(idGestore, dto)
+activate GS
+
+GS -> GR : gestoreRepo.findById(idGestore)
+activate GR
+GR -> DB : SELECT Gestore
+DB --> GR : Gestore
+GR --> GS : Gestore (con Agenzia)
+deactivate GR
+
+GS -> AS : adminCreateUser(dto.email)
+activate AS
+
+AS -> COG : AdminCreateUserRequest\n(email, email_verified=true,\nSUPPRESS messages)
+activate COG
+COG --> AS : AdminCreateUserResponse\n(user con attributo "sub")
+deactivate COG
+
+AS -> COG : AdminSetUserPasswordRequest\n(email, "DefaultPass123!", permanent=true)
+activate COG
+COG --> AS : OK
+deactivate COG
+
+AS --> GS : cognitoSub (UUID stringa)
+deactivate AS
+
+GS -> AS : setUserPasswordPermanent(\n  dto.email, "DefaultPass123!")
+activate AS
+AS -> COG : AdminSetUserPasswordRequest
+activate COG
+COG --> AS : OK
+deactivate COG
+AS --> GS : ok
+deactivate AS
+
+GS -> AS : addUserToGroup(dto.email, "Agenti")
+activate AS
+AS -> COG : AdminAddUserToGroupRequest\n(userPoolId, email, "Agenti")
+activate COG
+COG --> AS : OK
+deactivate COG
+AS --> GS : ok
+deactivate AS
+
+GS -> GS : Crea entità Agente via mapper\nsetta idUtente = cognitoSub\nsetta agenzia = gestore.agenzia\nsetta ruolo = "AGENTE"
+
+GS -> AR : agenteRepo.save(agente)
+activate AR
+AR -> DB : INSERT Agente
+DB --> AR : Agente salvato
+AR --> GS : Agente
+deactivate AR
+
+GS --> GC : AgenteDTO
+deactivate GS
+
+GC --> NAF : 200 OK {AgenteDTO}
+deactivate GC
+
+NAF --> G : Mostra conferma\n"Agente creato con successo"
+deactivate NAF
+deactivate FE
+
+@enduml
