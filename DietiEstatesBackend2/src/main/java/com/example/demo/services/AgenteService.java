@@ -8,10 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.demo.DTO.AgenteDTO;
-import com.example.demo.DTO.ImmobileDTO;
-import com.example.demo.DTO.OffertaDTO;
-import com.example.demo.DTO.StoricoOffertaDTO;
+import com.example.demo.dto.AgenteDTO;
+import com.example.demo.dto.ImmobileDTO;
+import com.example.demo.dto.OffertaDTO;
+import com.example.demo.dto.StoricoOffertaDTO;
 import com.example.demo.mapper.IImmobileMapper;
 import com.example.demo.mapper.IOffertaMapper;
 import com.example.demo.mapper.IStoricoOffertaMapper;

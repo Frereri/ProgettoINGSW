@@ -1,7 +1,7 @@
 package com.example.demo.services;
 
-import com.example.demo.DTO.ImmobileDTO;
-import com.example.demo.DTO.ImmobileImmagineDTO;
+import com.example.demo.dto.ImmobileDTO;
+import com.example.demo.dto.ImmobileImmagineDTO;
 import com.example.demo.mapper.IImmobileMapper;
 import com.example.demo.models.Agente;
 import com.example.demo.models.Agenzia;

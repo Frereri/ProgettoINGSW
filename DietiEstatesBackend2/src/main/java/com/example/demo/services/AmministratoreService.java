@@ -6,8 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.demo.DTO.GestoreDTO;
-import com.example.demo.DTO.SupportoAmministratoreDTO;
+import com.example.demo.dto.GestoreDTO;
+import com.example.demo.dto.SupportoAmministratoreDTO;
 import com.example.demo.mapper.IUtenteMapper;
 import com.example.demo.models.Agenzia;
 import com.example.demo.models.Gestore;

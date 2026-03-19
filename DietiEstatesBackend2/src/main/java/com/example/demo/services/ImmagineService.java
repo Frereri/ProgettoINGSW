@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.demo.DTO.ImmobileImmagineDTO;
+import com.example.demo.dto.ImmobileImmagineDTO;
 import com.example.demo.mapper.IImmobileImmagineMapper;
 import com.example.demo.models.Immobile;
 import com.example.demo.models.ImmobileImmagine;

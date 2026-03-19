@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.DTO.AgenteDTO;
-import com.example.demo.DTO.ImmobileDTO;
+import com.example.demo.dto.AgenteDTO;
+import com.example.demo.dto.ImmobileDTO;
 import com.example.demo.services.GestoreService;
 
 

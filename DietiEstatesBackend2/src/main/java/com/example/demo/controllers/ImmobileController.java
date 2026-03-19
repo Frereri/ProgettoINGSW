@@ -1,6 +1,6 @@
 package com.example.demo.controllers;
 
-import com.example.demo.DTO.ImmobileDTO;
+import com.example.demo.dto.ImmobileDTO;
 import com.example.demo.services.ImmobileService;
 
 import java.util.List;

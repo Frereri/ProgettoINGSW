@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-import com.example.demo.DTO.OffertaDTO;
+import com.example.demo.dto.OffertaDTO;
 import com.example.demo.models.Offerta;
 
 @Mapper(componentModel = "Spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)

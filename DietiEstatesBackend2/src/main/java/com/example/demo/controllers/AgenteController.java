@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.DTO.AgenteDTO;
-import com.example.demo.DTO.ImmobileDTO;
-import com.example.demo.DTO.OffertaDTO;
+import com.example.demo.dto.AgenteDTO;
+import com.example.demo.dto.ImmobileDTO;
+import com.example.demo.dto.OffertaDTO;
 import com.example.demo.services.AgenteService;
 
 @RestController
