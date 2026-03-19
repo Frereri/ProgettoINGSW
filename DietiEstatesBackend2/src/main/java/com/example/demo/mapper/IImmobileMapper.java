@@ -5,7 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 
-import com.example.demo.DTO.ImmobileDTO;
+import com.example.demo.dto.ImmobileDTO;
 import com.example.demo.models.Appartamento;
 import com.example.demo.models.Immobile;
 import com.example.demo.models.Villa;

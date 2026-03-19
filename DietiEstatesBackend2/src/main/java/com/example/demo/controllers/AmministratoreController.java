@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.DTO.GestoreDTO;
-import com.example.demo.DTO.SupportoAmministratoreDTO;
+import com.example.demo.dto.GestoreDTO;
+import com.example.demo.dto.SupportoAmministratoreDTO;
 import com.example.demo.services.AmministratoreService;
 
 @RestController

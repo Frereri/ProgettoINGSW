@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.DTO.CambiaPasswordDTO;
-import com.example.demo.DTO.UtenteDTO;
+import com.example.demo.dto.CambiaPasswordDTO;
+import com.example.demo.dto.UtenteDTO;
 import com.example.demo.services.AuthService;
 import com.example.demo.services.UtenteService;
 

@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.demo.DTO.AgenziaDTO;
+import com.example.demo.dto.AgenziaDTO;
 import com.example.demo.mapper.IAgenziaMapper;
 import com.example.demo.models.Agenzia;
 import com.example.demo.repositories.AgenziaRepo;

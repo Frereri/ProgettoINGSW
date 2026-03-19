@@ -12,6 +12,7 @@ actor "Gestore" as GES
 actor "Amministratore" as ADM
 actor "AWS Cognito" as COG <<system>>
 actor "Geoapify API" as GEO <<system>>
+actor "Supporto Amministratore" as SPP
 
 ' ─── ACCESSO ──────────────────────────────────────
 rectangle "Accesso" {
@@ -61,7 +62,9 @@ rectangle "Gestione Agenti" {
 ' ─── AMMINISTRAZIONE ──────────────────────────────
 rectangle "Amministrazione Sistema" {
     usecase "Gestire agenzie\n(crea / modifica / elimina)" as UC_AGENZIE
-    usecase "Gestire utenti\n(visualizza / modifica / elimina)" as UC_UTENTI
+    usecase "Modificare / Eliminare agenzia" as UC_EDIT_AGENZIA
+    usecase "Visualizzare / Modificare utenti" as UC_UTENTI
+    usecase "Eliminare utenti" as UC_DEL_UTENTI
     usecase "Creare staff\n(Gestore / Supporto)" as UC_CREA_STAFF
 }
 
@@ -74,7 +77,8 @@ GUEST --> UC_DETAIL
 GUEST <|-- CLI
 GUEST <|-- AGE
 GUEST <|-- GES
-GUEST <|-- ADM
+GUEST <|-- SPP
+
 
 ' ─── RELAZIONI CLIENTE ────────────────────────────
 CLI --> UC_LOGIN
@@ -102,13 +106,19 @@ GES --> UC_DEL_AGE
 GES --> UC_LIST_AGE
 GES --> UC_IMM_AGE
 GES --> UC_PWD
+' ─── RELAZIONI SUPPORTO AMMINISTRATORE ─────────────────────
+SPP --> UC_UTENTI
+SPP -->  UC_PWD
+SPP --> UC_LOGOUT
+SPP --> UC_UTENTI
+SPP --> UC_EDIT_AGENZIA
+SPP <|-- ADM
 
 ' ─── RELAZIONI AMMINISTRATORE ─────────────────────
-ADM --> UC_LOGOUT
 ADM --> UC_AGENZIE
 ADM --> UC_UTENTI
+ADM --> UC_DEL_UTENTI
 ADM --> UC_CREA_STAFF
-ADM --> UC_PWD
 
 ' ─── SISTEMI ESTERNI ──────────────────────────────
 UC_REG ..> COG : <<include>>

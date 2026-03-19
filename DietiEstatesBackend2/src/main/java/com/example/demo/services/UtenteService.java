@@ -7,11 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.demo.DTO.AgenteDTO;
-import com.example.demo.DTO.CreazioneStaffDTO;
-import com.example.demo.DTO.GestoreDTO;
-import com.example.demo.DTO.RegistrazioneClienteDTO;
-import com.example.demo.DTO.UtenteDTO;
+import com.example.demo.dto.AgenteDTO;
+import com.example.demo.dto.CreazioneStaffDTO;
+import com.example.demo.dto.GestoreDTO;
+import com.example.demo.dto.RegistrazioneClienteDTO;
+import com.example.demo.dto.UtenteDTO;
 import com.example.demo.mapper.IUtenteMapper;
 import com.example.demo.models.Agente;
 import com.example.demo.models.Agenzia;

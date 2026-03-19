@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.demo.DTO.RegistrazioneClienteDTO;
+import com.example.demo.dto.RegistrazioneClienteDTO;
 import com.example.demo.mapper.IUtenteMapper;
 import com.example.demo.models.Cliente;
 import com.example.demo.repositories.UtenteRepo;

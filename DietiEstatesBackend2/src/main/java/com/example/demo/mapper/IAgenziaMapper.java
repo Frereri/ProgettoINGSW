@@ -3,7 +3,7 @@ package com.example.demo.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.example.demo.DTO.AgenziaDTO;
+import com.example.demo.dto.AgenziaDTO;
 import com.example.demo.models.Agenzia;
 
 @Mapper(componentModel = "spring")

@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-import com.example.demo.DTO.StoricoOffertaDTO;
+import com.example.demo.dto.StoricoOffertaDTO;
 import com.example.demo.models.Offerta;
 import com.example.demo.models.StoricoOfferta;
 

@@ -1,4 +1,4 @@
-package com.example.demo.DTO;
+package com.example.demo.dto;
 
 public class GestoreDTO extends UtenteDTO {
     

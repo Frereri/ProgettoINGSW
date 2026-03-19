@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.demo.DTO.RegistrazioneClienteDTO;
-import com.example.demo.DTO.RichiestaLoginDTO;
+import com.example.demo.dto.RegistrazioneClienteDTO;
+import com.example.demo.dto.RichiestaLoginDTO;
 import com.example.demo.services.AuthService;
 
 
