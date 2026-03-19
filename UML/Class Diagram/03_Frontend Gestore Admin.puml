@@ -1,0 +1,138 @@
+@startuml CD_Frontend_03_Gestore_Admin
+title Class Gestore & Amministratore
+
+skinparam classAttributeIconSize 0
+skinparam classFontStyle bold
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+
+' RIFERIMENTI ESTERNI  
+
+
+package "Services (ref)" {
+    class gestoreService <<ref>> {
+        +registraNuovoAgente(agenteData): Promise
+        +getMieiAgenti(): Promise
+        +eliminaAgente(idAgente): Promise
+        +aggiornaAgente(idAgente, agenteData): Promise
+    }
+}
+
+package "Shared (ref)" {
+    class ListaImmobili <<ref>> {}
+    class ChangePasswordForm <<ref>> {}
+    class useAuth <<hook ref>> {}
+}
+
+
+'DASHBOARD GESTORE       
+
+
+package "Dashboard Gestore" {
+    class GestoreDashboard {
+        -view: string
+        -selectedAgenteId: UUID
+        -selectedAgente: AgenteDTO
+        +handleAgenteCreato(): void
+        +handleEliminaClick(id): void
+        +handleEditClick(agente): void
+        +render(): JSX
+    }
+
+    class ListaAgenti {
+        +onEdit: Function
+        +onElimina: Function
+        -agenti: AgenteDTO[]
+        -loading: boolean
+        -error: string
+        +caricaAgenti(): Promise<void>
+        +render(): JSX
+    }
+
+    class NuovoAgenteForm {
+        +onSave: Function
+        -formData: AgenteFormData
+        -loading: boolean
+        -error: string
+        +handleSubmit(): Promise<void>
+        +render(): JSX
+    }
+}
+
+
+' DASHBOARD AMMINISTRATORE 
+
+
+package "Dashboard Amministratore" {
+    class AdminDashboard {
+        -view: string
+        -agenzie: AgenziaDTO[]
+        -utenti: UtenteDTO[]
+        -formData: StaffFormData
+        -userRole: string
+        +caricaAgenzie(): void
+        +caricaUtenti(): Promise<void>
+        +handleCreateAgenzia(): Promise<void>
+        +handleUpdateAgenzia(): Promise<void>
+        +handleDeleteAgenzia(id): Promise<void>
+        +handleUpdateUtente(): Promise<void>
+        +handleDeleteUtente(user): Promise<void>
+        +handleSubmitStaff(e, type): Promise<void>
+        +handleUpdatePassword(data): Promise<void>
+        +render(): JSX
+    }
+
+    class StaffForm {
+        +type: string
+        +formData: StaffFormData
+        +setFormData: Function
+        +agenzie: AgenziaDTO[]
+        +onSubmit: Function
+        +loading: boolean
+        +render(): JSX
+    }
+
+    class StatCards {
+        +agenzie: AgenziaDTO[]
+        +utenti: UtenteDTO[]
+        +render(): JSX
+    }
+
+    class TabellaAgenzie {
+        +agenzie: AgenziaDTO[]
+        +onEdit: Function
+        +onDelete: Function
+        +render(): JSX
+    }
+
+    class TabellaUtenti {
+        +utenti: UtenteDTO[]
+        +onEdit: Function
+        +onDelete: Function
+        +currentUserRole: string
+        +render(): JSX
+    }
+}
+
+
+' RELAZIONI  
+
+
+' Gestore
+GestoreDashboard -- ListaAgenti
+GestoreDashboard -- NuovoAgenteForm
+GestoreDashboard -- ListaImmobili
+
+ListaAgenti --> gestoreService : uses
+ListaAgenti --> useAuth : uses
+NuovoAgenteForm --> gestoreService : uses
+
+' Admin
+AdminDashboard -- StaffForm
+AdminDashboard -- StatCards
+AdminDashboard -- TabellaAgenzie
+AdminDashboard -- TabellaUtenti
+AdminDashboard -- ChangePasswordForm
+
+@enduml
