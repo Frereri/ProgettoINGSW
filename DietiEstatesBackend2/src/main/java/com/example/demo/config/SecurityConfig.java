@@ -35,6 +35,9 @@ public class SecurityConfig {
         	.cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
+            		
+        		.requestMatchers("/", "/index.html", "/assets/**", "/favicon.ico", "/vite.svg").permitAll()
+        		
         		.requestMatchers("/api/immobile/**").permitAll()
         		.requestMatchers("/api/agenzia/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
@@ -73,8 +76,9 @@ public class SecurityConfig {
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 	    CorsConfiguration configuration = new CorsConfiguration();
-//	    configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-	    configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+//	    configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+	    configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:8080"));
+	    
 	    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 	    configuration.setAllowedHeaders(Arrays.asList("*"));
 	    configuration.setAllowCredentials(true);
