@@ -32,17 +32,18 @@ public class AuthController {
     }
     
     @PostMapping("/signup-cliente")
-    public ResponseEntity<?> signupCliente(@RequestBody RegistrazioneClienteDTO dto) {
+    public ResponseEntity<Map<String, String>> signupCliente(@RequestBody RegistrazioneClienteDTO dto) {
         try {
             authService.registraCliente(dto);
             return ResponseEntity.ok(Map.of("message", "Registrazione effettuata!"));
         } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(Map.of("error", e.getReason()));
+            return ResponseEntity.status(e.getStatusCode())
+                                 .body(Map.of("error", e.getReason() != null ? e.getReason() : "Errore client"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                  .body(Map.of("error", "Errore interno del server"));
         }
-	}
+    }
     
     @PostMapping("/setup-admin")
     public ResponseEntity<String> setupAdmin(@RequestBody RichiestaLoginDTO request) {
