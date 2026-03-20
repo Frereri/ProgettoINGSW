@@ -115,6 +115,75 @@ public class ImmobileService {
         return mapper.immobileToDTO(salvato);
     }
     
+//    @Transactional
+//    public ImmobileDTO updateImmobile(Integer id, ImmobileDTO dto) {
+//        Immobile immobile = repo.findById(id)
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Immobile non trovato"));
+//
+//        boolean indirizzoCambiato = !immobile.getIndirizzo().equalsIgnoreCase(dto.getIndirizzo()) || 
+//                !immobile.getCitta().equalsIgnoreCase(dto.getCitta());
+//        
+//        for (ImmobileImmagineDTO imgDto : dto.getImmagini()) {
+//            if (imgDto.getIdImmagine() == null) {
+//                ImmobileImmagine nuovaImg = new ImmobileImmagine();
+//                nuovaImg.setUrlImmagine(imgDto.getUrlImmagine());
+//                nuovaImg.setCopertina(imgDto.isCopertina());
+//                nuovaImg.setImmobile(immobile);
+//                immobile.getImmagini().add(nuovaImg);
+//            }
+//        }
+//        
+//        if (dto.getImmagini() != null) {
+//            boolean nuovaCopertinaPresente = dto.getImmagini().stream().anyMatch(ImmobileImmagineDTO::isCopertina);
+//            if (nuovaCopertinaPresente) {
+//                immobile.getImmagini().forEach(img -> img.setCopertina(false));
+//            }
+//        }
+//
+//        for (ImmobileImmagineDTO imgDto : dto.getImmagini()) {
+//            if (imgDto.getIdImmagine() != null) {
+//                immobile.getImmagini().stream()
+//                    .filter(i -> i.getIdImmagine().equals(imgDto.getIdImmagine()))
+//                    .findFirst()
+//                    .ifPresent(i -> i.setCopertina(imgDto.isCopertina()));
+//            }
+//        }
+//        
+//        if (immobile instanceof Appartamento appartamento) {
+//            mapper.updateAppartamentoFromDTO(dto, appartamento);
+//        } else if (immobile instanceof Villa villa) {
+//            mapper.updateVillaFromDTO(dto, villa);
+//        }
+//
+//        if (indirizzoCambiato) {
+//            Map<String, Double> coords = geoService.getCoordinates(immobile.getIndirizzo() + ", " + immobile.getCitta());
+//            
+//            if (coords != null && coords.containsKey("lat")) {
+//                immobile.setLatitudine(coords.get("lat"));
+//                immobile.setLongitudine(coords.get("lon"));
+//
+//                immobile.setVicinoScuole(geoService.isNear(immobile.getLatitudine(), immobile.getLongitudine(), "education.school,education.university"));
+//                immobile.setVicinoParchi(geoService.isNear(immobile.getLatitudine(), immobile.getLongitudine(), "leisure.park,national_park"));
+//                immobile.setVicinoTrasporti(geoService.isNear(immobile.getLatitudine(), immobile.getLongitudine(), "public_transport.subway,public_transport.train,public_transport.bus"));
+//                
+//            }
+//        }
+//        
+//        List<Integer> idsDaTenere = dto.getImmagini().stream()
+//                .map(ImmobileImmagineDTO::getIdImmagine)
+//                .filter(Objects::nonNull)
+//                .toList();
+//
+//        immobile.getImmagini().removeIf(img -> !idsDaTenere.contains(img.getIdImmagine()));
+//
+//        for (ImmobileImmagine img : immobile.getImmagini()) {
+//            img.setImmobile(immobile);
+//        }
+//
+//        Immobile salvato = repo.save(immobile);
+//        return mapper.immobileToDTO(salvato);
+//    }
+    
     @Transactional
     public ImmobileDTO updateImmobile(Integer id, ImmobileDTO dto) {
         Immobile immobile = repo.findById(id)
@@ -122,7 +191,25 @@ public class ImmobileService {
 
         boolean indirizzoCambiato = !immobile.getIndirizzo().equalsIgnoreCase(dto.getIndirizzo()) || 
                 !immobile.getCitta().equalsIgnoreCase(dto.getCitta());
-        
+
+        aggiornaLogicaImmagini(immobile, dto);
+        aggiornaDatiSpecificiTipo(immobile, dto);
+
+        if (indirizzoCambiato) {
+            aggiornaCoordinateEVicinanze(immobile);
+        }
+
+        Immobile salvato = repo.save(immobile);
+        return mapper.immobileToDTO(salvato);
+    }
+
+    private void aggiornaLogicaImmagini(Immobile immobile, ImmobileDTO dto) {
+        if (dto.getImmagini() == null) return;
+
+        if (dto.getImmagini().stream().anyMatch(ImmobileImmagineDTO::isCopertina)) {
+            immobile.getImmagini().forEach(img -> img.setCopertina(false));
+        }
+
         for (ImmobileImmagineDTO imgDto : dto.getImmagini()) {
             if (imgDto.getIdImmagine() == null) {
                 ImmobileImmagine nuovaImg = new ImmobileImmagine();
@@ -130,58 +217,44 @@ public class ImmobileService {
                 nuovaImg.setCopertina(imgDto.isCopertina());
                 nuovaImg.setImmobile(immobile);
                 immobile.getImmagini().add(nuovaImg);
-            }
-        }
-        
-        if (dto.getImmagini() != null) {
-            boolean nuovaCopertinaPresente = dto.getImmagini().stream().anyMatch(ImmobileImmagineDTO::isCopertina);
-            if (nuovaCopertinaPresente) {
-                immobile.getImmagini().forEach(img -> img.setCopertina(false));
-            }
-        }
-
-        for (ImmobileImmagineDTO imgDto : dto.getImmagini()) {
-            if (imgDto.getIdImmagine() != null) {
+            } else {
                 immobile.getImmagini().stream()
                     .filter(i -> i.getIdImmagine().equals(imgDto.getIdImmagine()))
                     .findFirst()
                     .ifPresent(i -> i.setCopertina(imgDto.isCopertina()));
             }
         }
+
+        List<Integer> idsDaTenere = dto.getImmagini().stream()
+                .map(ImmobileImmagineDTO::getIdImmagine)
+                .filter(Objects::nonNull)
+                .toList();
         
+        immobile.getImmagini().removeIf(img -> 
+            img.getIdImmagine() != null && !idsDaTenere.contains(img.getIdImmagine()));
+    }
+
+    private void aggiornaDatiSpecificiTipo(Immobile immobile, ImmobileDTO dto) {
         if (immobile instanceof Appartamento appartamento) {
             mapper.updateAppartamentoFromDTO(dto, appartamento);
         } else if (immobile instanceof Villa villa) {
             mapper.updateVillaFromDTO(dto, villa);
         }
+    }
 
-        if (indirizzoCambiato) {
-            Map<String, Double> coords = geoService.getCoordinates(immobile.getIndirizzo() + ", " + immobile.getCitta());
-            
-            if (coords != null && coords.containsKey("lat")) {
-                immobile.setLatitudine(coords.get("lat"));
-                immobile.setLongitudine(coords.get("lon"));
-
-                immobile.setVicinoScuole(geoService.isNear(immobile.getLatitudine(), immobile.getLongitudine(), "education.school,education.university"));
-                immobile.setVicinoParchi(geoService.isNear(immobile.getLatitudine(), immobile.getLongitudine(), "leisure.park,national_park"));
-                immobile.setVicinoTrasporti(geoService.isNear(immobile.getLatitudine(), immobile.getLongitudine(), "public_transport.subway,public_transport.train,public_transport.bus"));
-                
-            }
-        }
+    private void aggiornaCoordinateEVicinanze(Immobile immobile) {
+        Map<String, Double> coords = geoService.getCoordinates(immobile.getIndirizzo() + ", " + immobile.getCitta());
         
-        List<Integer> idsDaTenere = dto.getImmagini().stream()
-                .map(ImmobileImmagineDTO::getIdImmagine)
-                .filter(Objects::nonNull)
-                .toList();
+        if (coords != null && coords.containsKey("lat")) {
+            double lat = coords.get("lat");
+            double lon = coords.get("lon");
+            immobile.setLatitudine(lat);
+            immobile.setLongitudine(lon);
 
-        immobile.getImmagini().removeIf(img -> !idsDaTenere.contains(img.getIdImmagine()));
-
-        for (ImmobileImmagine img : immobile.getImmagini()) {
-            img.setImmobile(immobile);
+            immobile.setVicinoScuole(geoService.isNear(lat, lon, "education.school,education.university"));
+            immobile.setVicinoParchi(geoService.isNear(lat, lon, "leisure.park,national_park"));
+            immobile.setVicinoTrasporti(geoService.isNear(lat, lon, "public_transport.subway,public_transport.train,public_transport.bus"));
         }
-
-        Immobile salvato = repo.save(immobile);
-        return mapper.immobileToDTO(salvato);
     }
 
     public void deleteImmobile(Integer id) {
