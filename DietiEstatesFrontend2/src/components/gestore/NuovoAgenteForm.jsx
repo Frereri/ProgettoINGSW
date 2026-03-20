@@ -20,7 +20,7 @@ const NuovoAgenteForm = ({ onSave }) => {
             setFormData({ nome: '', cognome: '', email: '', ruolo: 'AGENTE' });
             onSave();
         } catch (err) {
-            setError(err.message || "Errore durante la registrazione del collaboratore.");
+            setError(err.message || "Errore durante la registrazione dell'agente.");
         } finally {
             setLoading(false);
         }
