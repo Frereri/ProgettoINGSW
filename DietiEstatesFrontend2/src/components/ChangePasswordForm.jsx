@@ -40,8 +40,12 @@ const ChangePasswordForm = ({ styles, onUpdate }) => {
                 erroreTesto = "La vecchia password inserita non è corretta.";
             } else if (err.name === 'LimitExceededException') {
                 erroreTesto = "Troppi tentativi falliti. Riprova più tardi.";
-            }else if (err.message?.includes("symbol")  ) {
-                erroreTesto = "La nuova password deve contenere almeno un carattere speciale";
+            } else if (err.message?.includes("number") || err.message?.includes("numeric")) {
+                erroreTesto = "La nuova password deve contenere almeno un numero.";
+            } else if (err.message?.includes("symbol") || err.message?.includes("special")) {
+                erroreTesto = "La nuova password deve contenere almeno un carattere speciale.";
+            } else if (err.message?.includes("uppercase")) {
+                erroreTesto = "La nuova password deve contenere almeno una lettera maiuscola.";
             } else if (err.message) {
                 erroreTesto = err.message;
             }
