@@ -181,9 +181,8 @@ public class AuthService {
             
             return tokens; 
         } catch (Exception e) {
-        	logger.log(Level.SEVERE, "Errore Geocoding: {0}", e.getMessage());
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenziali non valide: " + e.getMessage());
-        }
+        	logger.log(Level.SEVERE, "Errore durante l''autenticazione per l''utente: {0}", email);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenziali non valide", e);        }
     }
     
     public void confirmUser(String email) {
@@ -214,11 +213,11 @@ public class AuthService {
                     .build();
 
             cognitoClient.adminDeleteUser(deleteRequest);
-            logger.info("Utente rimosso con successo da Cognito: " + email);
+            logger.log(Level.INFO, "Utente rimosso con successo da Cognito: {0}", email);
         } catch (UserNotFoundException e) {
             logger.warning("Tentativo di eliminare utente non esistente su Cognito: " + email);
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Errore durante l'eliminazione utente Cognito: {0}", e.getMessage());
+            logger.log(Level.SEVERE, "Errore durante l''eliminazione utente Cognito: {0}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Errore nella sincronizzazione con AWS");
         }
     }
