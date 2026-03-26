@@ -148,11 +148,28 @@
 </plugin>
 
 
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-clean-plugin</artifactId>
+
+    <configuration>
+        <filesets>
+            <fileset>
+                <directory>${project.build.directory}</directory>
+                <excludes>
+                    <exclude>node/**</exclude>
+                </excludes>
+            </fileset>
+        </filesets>
+    </configuration>
+</plugin>
+
+
 
 
 			<plugin>
 			    <artifactId>maven-resources-plugin</artifactId>
-			    <version>3.3.1</version>
+		
 			    <executions>
 			        <execution>
 			            <id>copy-frontend-content</id>
