@@ -121,7 +121,8 @@ class AgenteServiceTest {
         assertNotNull(risultato);
         verify(offertaRepo).save(argThat(Offerta::isOffertaEsterna));
     }
-    
+
+    @Test
     @DisplayName("Metodo 4: getProfiloAgente - Errore Agente Non Trovato")
     void testGetProfiloAgenteNotFound() {
         UUID idAgente = UUID.randomUUID();
