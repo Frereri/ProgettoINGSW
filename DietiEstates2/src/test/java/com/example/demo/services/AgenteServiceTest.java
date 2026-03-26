@@ -121,7 +121,12 @@ class AgenteServiceTest {
         assertNotNull(risultato);
         verify(offertaRepo).save(argThat(Offerta::isOffertaEsterna));
     }
+<<<<<<< HEAD
     
+=======
+
+    @Test
+>>>>>>> 40b34e3ae85b5c35b32c290029851c20f09ffb7f
     @DisplayName("Metodo 4: getProfiloAgente - Errore Agente Non Trovato")
     void testGetProfiloAgenteNotFound() {
         UUID idAgente = UUID.randomUUID();
@@ -134,4 +139,8 @@ class AgenteServiceTest {
 
         assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 40b34e3ae85b5c35b32c290029851c20f09ffb7f
